@@ -1,0 +1,15 @@
+CREATE TABLE [dbo].[approvalfinal](
+	[FinalApprovedID] [int] IDENTITY(1,1) NOT NULL,
+	[ModuleCode] [varchar](200) NULL,
+	[ApprovalStatus] [varchar](200) NULL,
+	[UsernameFrom] [varchar](200) NULL,
+	[RoleFrom] [varchar](200) NULL,
+	[EmailFrom] [varchar](300) NULL,
+	[UserNameTo] [varchar](200) NULL,
+	[RoleTo] [varchar](200) NULL,
+	[EmailTo] [varchar](300) NULL,
+	[TimeDate] [smalldatetime] NULL,
+	[Comments] [varchar](1000) NULL
+) ON [PRIMARY]
+
+GO

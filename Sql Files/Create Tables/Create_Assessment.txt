@@ -1,0 +1,14 @@
+CREATE TABLE [dbo].[assessment](
+	[AssessmentID] [int] IDENTITY(1,1) NOT NULL,
+	[AssessmentStrategy] [varchar](max) NULL,
+	[Formative] [varchar](max) NULL,
+	[Summative] [varchar](max) NULL,
+	[Tasks] [varchar](max) NULL,
+	[Criteria] [varchar](max) NULL,
+ CONSTRAINT [PK__assessme__3D2BF83E33BB1C10] PRIMARY KEY CLUSTERED 
+(
+	[AssessmentID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+GO

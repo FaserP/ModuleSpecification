@@ -1,0 +1,13 @@
+CREATE TABLE [dbo].[otherinfos](
+	[InfoID] [int] IDENTITY(1,1) NOT NULL,
+	[ModuleAims] [varchar](1000) NULL,
+	[ModuleScheme] [varchar](100) NULL,
+	[OtherInfo] [varchar](1000) NULL,
+	[ModuleStatus] [varchar](100) NULL,
+ CONSTRAINT [PK__otherinf__4DEC9D9A7446DF59] PRIMARY KEY CLUSTERED 
+(
+	[InfoID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO

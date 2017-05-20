@@ -1,0 +1,18 @@
+CREATE TABLE [dbo].[learningmethods](
+	[MethodsID] [int] IDENTITY(1,1) NOT NULL,
+	[Lecture] [decimal](18, 1) NULL,
+	[Seminar] [decimal](18, 1) NULL,
+	[TutorialAndProject] [decimal](18, 1) NULL,
+	[PracticalAndDemonstrations] [decimal](18, 1) NULL,
+	[StudioAndWorkshop] [decimal](18, 1) NULL,
+	[FieldworkAndExternal] [decimal](18, 1) NULL,
+	[WorkbasedLearning] [decimal](18, 1) NULL,
+	[Placement] [decimal](18, 1) NULL,
+	[IndependentStudy] [decimal](18, 1) NULL,
+ CONSTRAINT [PK__learning__E39CB5CC24CBB022] PRIMARY KEY CLUSTERED 
+(
+	[MethodsID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO

@@ -1,0 +1,12 @@
+CREATE TABLE [dbo].[learningoutcomes](
+	[OutcomesID] [int] IDENTITY(1,1) NOT NULL,
+	[LearningOutcomes] [varchar](4000) NULL,
+	[Knowledge] [varchar](4000) NULL,
+	[Abilities] [varchar](4000) NULL,
+ CONSTRAINT [PK__learning__E44DC52E73712DC6] PRIMARY KEY CLUSTERED 
+(
+	[OutcomesID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO

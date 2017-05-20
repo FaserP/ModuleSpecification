@@ -1,0 +1,13 @@
+CREATE TABLE [dbo].[temptabletutor](
+	[ModuleID] [int] NOT NULL,
+	[TutorID] [int] NOT NULL,
+	[TutorName] [varchar](100) NULL,
+	[DeptName] [varchar](100) NULL,
+ CONSTRAINT [PK_temptabletutor] PRIMARY KEY CLUSTERED 
+(
+	[ModuleID] ASC,
+	[TutorID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO

@@ -1,0 +1,18 @@
+CREATE TABLE [dbo].[temptableassessment](
+	[SummativeID] [int] IDENTITY(1,1) NOT NULL,
+	[ModuleID] [int] NOT NULL,
+	[AssessmentID] [int] NOT NULL,
+	[AssessmentType] [varchar](200) NULL,
+	[LO] [varchar](200) NULL,
+	[Summary] [varchar](2000) NULL,
+	[Component] [varchar](200) NULL,
+	[FE] [bit] NULL,
+	[TR] [bit] NULL,
+	[AM] [bit] NULL,
+ CONSTRAINT [PK_temptableassessment] PRIMARY KEY CLUSTERED 
+(
+	[SummativeID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO

@@ -1,0 +1,13 @@
+CREATE TABLE [dbo].[moduletype](
+	[TypeID] [int] IDENTITY(1,1) NOT NULL,
+	[Compulsory] [varchar](300) NULL,
+	[Core] [varchar](300) NULL,
+	[Optional] [varchar](300) NULL,
+	[StandAlone] [varchar](300) NULL,
+ CONSTRAINT [PK__modulety__516F0395A9E2569C] PRIMARY KEY CLUSTERED 
+(
+	[TypeID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
