@@ -1,0 +1,17 @@
+<%@ Page Title="Approval Message Page" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="ApprovedMessage.aspx.cs" Inherits="ModuleSpecificationSite.Members.ApprovedMessage" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
+    <div style="text-align: center; font-weight: bold; font-size: medium">
+        Thank You<br />
+        <br />
+        Module information has been sent to inform the next person by email.<br />
+        <br />
+        <asp:HyperLink ID="LinkBackTo" runat="server" 
+            NavigateUrl="~/Members/ModuleSearch.aspx">Click here</asp:HyperLink>
+&nbsp;to return back to the search page or
+        <asp:LoginStatus ID="HeadLoginStatus" runat="server" LogoutAction="Redirect" 
+            LogoutText="Log Out" LogoutPageUrl="~/Login.aspx" 
+            LoginText="Log Out"/>
+    </div>
+</asp:Content>

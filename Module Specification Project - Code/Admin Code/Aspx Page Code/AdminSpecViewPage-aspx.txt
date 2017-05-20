@@ -1,0 +1,2092 @@
+<%@ Page Title="Admin Module Spec View Page" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="AdminSpecViewPage.aspx.cs" Inherits="ModuleSpecificationSite.Admin.AdminSpecViewPage" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
+    <link href="~/Styles/Site.css" rel="stylesheet" type="text/css" />
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
+    <h2 style="text-align: center">
+        &nbsp;<asp:Label ID="lblStoreModuleCode" runat="server" Visible="False"></asp:Label>
+        <asp:Label ID="LabelCode" runat="server"></asp:Label>
+        <asp:Label ID="LabelTitle" runat="server"></asp:Label>
+    </h2>
+    <asp:SqlDataSource ID="SqlModuleTemplateDetails" runat="server" 
+        ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>" 
+        SelectCommand="SelectNewMoulde" 
+        SelectCommandType="StoredProcedure" UpdateCommand="UpdateModuleInformation" 
+        UpdateCommandType="StoredProcedure">
+        <SelectParameters>
+            <asp:ControlParameter ControlID="lblStoreModuleCode" Name="ModuleID" 
+                PropertyName="Text" Type="Int32" />
+        </SelectParameters>
+        <UpdateParameters>
+            <asp:Parameter Name="ModuleID" Type="Int32" />
+            <asp:Parameter Name="ModuleCode" Type="String" />
+            <asp:Parameter Name="ModuleTitle" Type="String" />
+            <asp:Parameter Name="CreditRating" Type="String" />
+            <asp:Parameter Name="ModuleRating" Type="String" />
+            <asp:Parameter Name="Pre_Requisites" Type="String" />
+            <asp:Parameter Name="R_P_S" Type="String" />
+            <asp:Parameter Name="Co_Requisites" Type="String" />
+            <asp:Parameter Name="SharedTeaching" Type="String" />
+            <asp:Parameter Name="P_B_R" Type="String" />
+            <asp:Parameter Name="Graded" Type="String" />
+            <asp:Parameter Name="BarredCombination" Type="String" />
+            <asp:Parameter Name="Synopsis" Type="String" />
+            <asp:Parameter Name="Syllabus" Type="String" />
+            <asp:Parameter Name="Strategy" Type="String" />
+            <asp:Parameter Name="ResourcesRequired" Type="String" />
+            <asp:Parameter Name="ReadingList" Type="String" />
+            <asp:Parameter Name="Approved" Type="String" />
+            <asp:Parameter Name="ActiveModule" Type="Boolean" />
+            <asp:Parameter Name="OutcomesID" Type="Int32" />
+            <asp:Parameter Name="LearningOutcomes" Type="String" />
+            <asp:Parameter Name="Knowledge" Type="String" />
+            <asp:Parameter Name="Abilities" Type="String" />
+            <asp:Parameter Name="AssessmentID" Type="Int32" />
+            <asp:Parameter Name="AssessmentStrategy" Type="String" />
+            <asp:Parameter Name="Formative" Type="String" />
+            <asp:Parameter Name="Summative" Type="String" />
+            <asp:Parameter Name="Tasks" Type="String" />
+            <asp:Parameter Name="Criteria" Type="String" />
+            <asp:Parameter Name="SchoolID" Type="Int32" />
+            <asp:Parameter Name="TypeID" Type="Int32" />
+            <asp:Parameter Name="Compulsory" Type="String" />
+            <asp:Parameter Name="Core" Type="String" />
+            <asp:Parameter Name="Optional" Type="String" />
+            <asp:Parameter Name="StandAlone" Type="String" />
+            <asp:Parameter Name="MethodsID" Type="Int32" />
+            <asp:Parameter Name="Lecture" Type="Decimal" />
+            <asp:Parameter Name="Seminar" Type="Decimal" />
+            <asp:Parameter Name="TutorialAndProject" Type="Decimal" />
+            <asp:Parameter Name="PracticalAndDemonstrations" Type="Decimal" />
+            <asp:Parameter Name="StudioAndWorkshop" Type="Decimal" />
+            <asp:Parameter Name="FieldworkAndExternal" Type="Decimal" />
+            <asp:Parameter Name="WorkbasedLearning" Type="Decimal" />
+            <asp:Parameter Name="Placement" Type="Decimal" />
+            <asp:Parameter Name="IndependentStudy" Type="Decimal" />
+            <asp:Parameter Name="TotalHours" Type="Decimal" />
+            <asp:Parameter Name="InfoID" Type="Int32" />
+            <asp:Parameter Name="ModuleAims" Type="String" />
+            <asp:Parameter Name="ModuleScheme" Type="String" />
+            <asp:Parameter Name="OtherInfo" Type="String" />
+            <asp:Parameter Name="ModuleStatus" Type="String" />
+        </UpdateParameters>
+    </asp:SqlDataSource>
+                <asp:SqlDataSource ID="SqlCourseDetails" runat="server" 
+                                ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>" 
+                                DeleteCommand="DeleteModuleCourse" DeleteCommandType="StoredProcedure" 
+                                InsertCommand="InsertModuleCourse" InsertCommandType="StoredProcedure" 
+                                SelectCommand="SelectModuleCourseInformation" SelectCommandType="StoredProcedure" 
+                    onselected="SqlDataSourceCourseDetails_Selected">
+                    <DeleteParameters>
+                        <asp:Parameter Name="ModuleID" />
+                        <asp:Parameter Name="CourseID" />
+                    </DeleteParameters>
+                    <InsertParameters>
+                        <asp:Parameter Name="ModuleID" Type="Int32" />
+                        <asp:Parameter Name="CourseID" Type="Int32" />
+                    </InsertParameters>
+                    <SelectParameters>
+                        <asp:ControlParameter ControlID="FormViewModuleTemplate" Name="ModuleID" 
+                                        PropertyName="SelectedValue" Type="Int32" />
+                    </SelectParameters>
+                </asp:SqlDataSource>
+                <asp:SqlDataSource ID="SqlTutorDetails" runat="server" 
+                                ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>" 
+                                DeleteCommand="DeleteModuleTutor" DeleteCommandType="StoredProcedure" 
+                                InsertCommand="InsertModuleTutor" InsertCommandType="StoredProcedure" 
+                                SelectCommand="SelectModuleTutorInformation" SelectCommandType="StoredProcedure" 
+                    onselected="SqlDataSourceTutorDetails_Selected">
+                    <InsertParameters>
+                        <asp:Parameter Name="ModuleID" Type="Int32" />
+                        <asp:Parameter Name="TutorID" Type="Int32" />
+                    </InsertParameters>
+                    <SelectParameters>
+                        <asp:ControlParameter ControlID="FormViewModuleTemplate" Name="ModuleID" 
+                                        PropertyName="SelectedValue" Type="Int32" />
+                    </SelectParameters>
+                    <DeleteParameters>
+                        <asp:Parameter Name="ModuleID" Type="Int32" />
+                        <asp:Parameter Name="TutorID" Type="Int32" />
+                    </DeleteParameters>
+                </asp:SqlDataSource>
+                <asp:SqlDataSource ID="SqlLocationDetails" runat="server" 
+                                ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>" 
+                                DeleteCommand="DeleteModuleLocation" DeleteCommandType="StoredProcedure" 
+                                InsertCommand="InsertModuleLocation" InsertCommandType="StoredProcedure" 
+                                SelectCommand="SelectModuleLocationInformation" SelectCommandType="StoredProcedure" 
+                    onselected="SqlDataSourceLocationDetails_Selected">
+                    <InsertParameters>
+                        <asp:Parameter Name="ModuleID" Type="Int32" />
+                        <asp:Parameter Name="LocationID" Type="Int32" />
+                    </InsertParameters>
+                    <SelectParameters>
+                        <asp:ControlParameter ControlID="FormViewModuleTemplate" Name="ModuleID" 
+                                        PropertyName="SelectedValue" Type="Int32" />
+                    </SelectParameters>
+                    <DeleteParameters>
+                        <asp:Parameter Name="ModuleID" Type="Int32" />
+                        <asp:Parameter Name="LocationID" Type="Int32" />
+                    </DeleteParameters>
+                </asp:SqlDataSource>
+            <asp:SqlDataSource ID="SqlSchool" runat="server" 
+        ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>" 
+        SelectCommand="SelectSchoolInformation" 
+        SelectCommandType="StoredProcedure"></asp:SqlDataSource>
+                <asp:SqlDataSource ID="SqlAssessmentTable" runat="server" 
+                            ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>" 
+                            DeleteCommand="DeleteModuleAssessmentTable" DeleteCommandType="StoredProcedure" 
+                            InsertCommand="InsertModuleAssessmentTable" InsertCommandType="StoredProcedure" 
+                            OldValuesParameterFormatString="original_{0}" 
+                            SelectCommand="SelectAssessmentTableInformation" 
+                            SelectCommandType="StoredProcedure" 
+        onselected="SqlDataSourceAssessmentTable_Selected">
+                    <DeleteParameters>
+                        <asp:Parameter Name="original_SummativeID" Type="Int32" />
+                    </DeleteParameters>
+                    <InsertParameters>
+                        <asp:Parameter Name="AssessmentType" Type="String" />
+                        <asp:Parameter Name="LO" Type="String" />
+                        <asp:Parameter Name="Summary" Type="String" />
+                        <asp:Parameter Name="Component" Type="String" />
+                        <asp:Parameter Name="FE" Type="Boolean" />
+                        <asp:Parameter Name="TR" Type="Boolean" />
+                        <asp:Parameter Name="AM" Type="Boolean" />
+                        <asp:Parameter Name="AssessmentID" Type="Int32" />
+                    </InsertParameters>
+                    <SelectParameters>
+                        <asp:ControlParameter ControlID="FormViewModuleTemplate" Name="AssessmentID" 
+                                    PropertyName="SelectedValue" Type="Int32" />
+                    </SelectParameters>
+    </asp:SqlDataSource>
+            <asp:ScriptManager ID="ScriptManager" runat="server">
+    </asp:ScriptManager>
+        <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+        <ContentTemplate>
+            <table style="width:100%;">
+                <tr>
+                    <td style="width: 100px; text-align: center;">
+                        <asp:ImageButton ID="btnExportToWord" runat="server" Height="42px" 
+                            ImageUrl="~/Resources/word.png" onclick="btnExportToWord_Click" 
+                            OnClientClick="javascript:return confirm('You are about to export the updated information to the document. Click OK to update the information to the document and please wait for a few seconds for a link to appear');" 
+                            style="margin-bottom: 0px" ToolTip="Export to Word" Width="42px" />
+                        <br />
+                        <asp:Label ID="Label31" runat="server" Text="Extract to Word"></asp:Label>
+                    </td>
+                    <td style="width: 100px; text-align: center;">
+                        <asp:ImageButton ID="btnExportToPDF" runat="server" Height="42px" 
+                            ImageUrl="~/Resources/pdf.png" onclick="btnExportToPDF_Click" 
+                            OnClientClick="javascript:return confirm('You are about to export the information to PDF. Click OK to export the file and then wait a few seconds for a link to appear below the export button');" 
+                            Width="42px" />
+                        <br />
+                        <asp:Label ID="Label32" runat="server" Text="Extract to PDF"></asp:Label>
+                    </td>
+                    <td style="width: 350px">
+                    </td>
+                    <td style="text-align: center; width: 100px;">
+                        <asp:ImageButton ID="btnExportToWord0" runat="server" Height="42px" 
+                            ImageUrl="~/Resources/word.png" onclick="OpenWordLink_Click" 
+                            style="margin-bottom: 0px" ToolTip="Export to Word" Width="42px" />
+                        <br />
+                        <asp:Label ID="Label29" runat="server" Text="View Word"></asp:Label>
+                    </td>
+                    <td style="text-align: center; width: 100px;">
+                        <asp:ImageButton ID="btnExportToPDF0" runat="server" Height="42px" 
+                            ImageUrl="~/Resources/pdf.png" onclick="OpenPDFLink_Click" Width="42px" />
+                        <br />
+                        <asp:Label ID="Label30" runat="server" Text="View PDF"></asp:Label>
+                    </td>
+                    <td style="text-align: right">
+                        <asp:Button ID="BackSearchButton" runat="server" 
+                            PostBackUrl="~/Members/ModuleSearch.aspx" Text="Return to Search" 
+                            Width="113px" />
+                    </td>
+                </tr>
+            </table>
+            <asp:LinkButton ID="OpenWordLink" runat="server" onclick="OpenWordLink_Click"></asp:LinkButton>
+            <asp:LinkButton ID="OpenPDFLink" runat="server" onclick="OpenPDFLink_Click" 
+                Visible="False"></asp:LinkButton>
+        </ContentTemplate>
+    </asp:UpdatePanel>
+        <asp:UpdateProgress ID="UpdateProgress1" runat="server">
+            <ProgressTemplate>
+                <asp:Image ID="Image1" runat="server" ImageUrl="~/Resources/loader-life.gif" />
+            </ProgressTemplate>
+        </asp:UpdateProgress>
+    <asp:FormView ID="FormViewModuleTemplate" runat="server" 
+        DataKeyNames="ModuleID,OutcomesID,AssessmentID,MethodsID,TypeID,InfoID" 
+        DataSourceID="SqlModuleTemplateDetails" Width="914px" 
+        onmodechanged="FormViewModuleTemplate_ModeChanged">
+        <EditItemTemplate>
+            <div style="text-align: right">
+                <asp:CheckBox ID="ActiveModuleCB" runat="server" 
+                    Checked='<%# Bind("ActiveModule") %>' Text="Module Active" />
+                &nbsp;- Tick this if this module is active/Untick this if this module in not active</div>
+            &nbsp;<br />
+            <table style="width:100%;">
+                <tr>
+                    <td class="TemplateSubHeader" 
+                        style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                        Module Code:</td>
+                    <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                        <asp:TextBox ID="TextBoxModuleCode" runat="server" 
+                            Text='<%# Bind("ModuleCode") %>' Width="537px"></asp:TextBox>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        &nbsp;</td>
+                </tr>
+            </table>
+            <table style="width:100%;">
+                <tr>
+                    <td class="TemplateSubHeader" 
+                        
+                        
+                        style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                        Module Title:</td>
+                    <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                        <asp:TextBox ID="TextBoxModuleTitle" runat="server" 
+                            Text='<%# Bind("ModuleTitle") %>' Width="537px"></asp:TextBox>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        &nbsp;</td>
+                </tr>
+            </table>
+            <table style="width: 100%;">
+                <tr>
+                    <td class="TemplateSubHeader" 
+                        style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                        School/s Involved In Delivery:</td>
+                    <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                        <asp:DropDownList ID="DropDownListSchoolID" runat="server" 
+                            DataSourceID="SqlSchool" DataTextField="SchoolName" DataValueField="SchoolID" 
+                            SelectedValue='<%# Bind("SchoolID") %>' Width="300px">
+                        </asp:DropDownList>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        &nbsp;</td>
+                </tr>
+            </table>
+            <table style="width:100%;">
+                <tr>
+                    <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                        Name of Course(s):</td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:SqlDataSource ID="SqlGetCourses" runat="server" 
+                            ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>" 
+                            SelectCommand="GetCourses" SelectCommandType="StoredProcedure">
+                        </asp:SqlDataSource>
+                        <asp:GridView ID="GridViewCourseDetails1" runat="server" 
+                            AutoGenerateColumns="False" BackColor="White" BorderColor="#999999" 
+                            BorderStyle="None" BorderWidth="1px" CellPadding="3" 
+                            DataKeyNames="ModuleID,CourseID" DataSourceID="SqlCourseDetails" 
+                            GridLines="Vertical" HorizontalAlign="Justify" ShowHeader="False" 
+                            Width="914px">
+                            <AlternatingRowStyle BackColor="#DCDCDC" />
+                            <Columns>
+                                <asp:CommandField ShowDeleteButton="True" />
+                                <asp:BoundField DataField="ModuleID" HeaderText="ModuleID" ReadOnly="True" 
+                                    SortExpression="ModuleID" Visible="False" />
+                                <asp:BoundField DataField="CourseID" HeaderText="CourseID" ReadOnly="True" 
+                                    SortExpression="CourseID" Visible="False" />
+                                <asp:BoundField DataField="CourseName" HeaderText="CourseName" ReadOnly="True" 
+                                    SortExpression="CourseName" />
+                            </Columns>
+                            <FooterStyle BackColor="#CCCCCC" ForeColor="Black" />
+                            <HeaderStyle BackColor="#000084" Font-Bold="True" ForeColor="White" />
+                            <PagerStyle BackColor="#999999" ForeColor="Black" HorizontalAlign="Center" />
+                            <RowStyle BackColor="#EEEEEE" ForeColor="Black" />
+                            <SelectedRowStyle BackColor="#008A8C" Font-Bold="True" ForeColor="White" />
+                            <SortedAscendingCellStyle BackColor="#F1F1F1" />
+                            <SortedAscendingHeaderStyle BackColor="#0000A9" />
+                            <SortedDescendingCellStyle BackColor="#CAC9C9" />
+                            <SortedDescendingHeaderStyle BackColor="#000065" />
+                        </asp:GridView>
+                        <asp:Label ID="lblCourseError" runat="server" Font-Size="Medium" 
+                            ForeColor="Black"></asp:Label>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; color: #FFFFFF; font-weight: bold; background-color: #006699;">
+                        <asp:DropDownList ID="DropDownListCourses" runat="server" 
+                            DataSourceID="SqlGetCourses" DataTextField="CourseName" 
+                            DataValueField="CourseID" style="margin-bottom: 0px" Width="642px">
+                        </asp:DropDownList>
+                        &nbsp;<asp:LinkButton ID="lbAddCourse" runat="server" ForeColor="White" 
+                            onclick="lbAddCourse_Click">Add Course</asp:LinkButton>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; font-size: medium">
+                        <asp:LinkButton ID="LinkButtonRefresh0" runat="server" 
+                            OnClick="LinkButtonRefresh_Click">Refresh Course List</asp:LinkButton>
+                    </td>
+                </tr>
+            </table>
+            <table style="width:100%;">
+                <tr>
+                    <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                        Module Leader:</td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:SqlDataSource ID="SqlGetTutors" runat="server" 
+                            ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>" 
+                            SelectCommand="GetTutors" SelectCommandType="StoredProcedure">
+                        </asp:SqlDataSource>
+                        <asp:GridView ID="GridViewTutorDetails1" runat="server" 
+                            AutoGenerateColumns="False" BackColor="White" BorderColor="#999999" 
+                            BorderStyle="None" BorderWidth="1px" CellPadding="3" 
+                            DataKeyNames="ModuleID,TutorID" DataSourceID="SqlTutorDetails" 
+                            GridLines="Vertical" HorizontalAlign="Justify" ShowHeader="False" 
+                            Width="914px">
+                            <AlternatingRowStyle BackColor="#DCDCDC" />
+                            <Columns>
+                                <asp:CommandField ShowDeleteButton="True" >
+                                <ItemStyle Width="100px" />
+                                </asp:CommandField>
+                                <asp:BoundField DataField="ModuleID" HeaderText="ModuleID" ReadOnly="True" 
+                                    SortExpression="ModuleID" Visible="False" />
+                                <asp:BoundField DataField="TutorID" HeaderText="TutorID" ReadOnly="True" 
+                                    SortExpression="TutorID" Visible="False" />
+                                <asp:BoundField DataField="DeptID" HeaderText="DeptID" SortExpression="DeptID" 
+                                    Visible="False" />
+                                <asp:BoundField DataField="ModuleLeader" HeaderText="ModuleLeader" 
+                                    SortExpression="ModuleLeader" />
+                                <asp:BoundField DataField="TutorLogin" HeaderText="TutorLogin" 
+                                    SortExpression="TutorLogin" Visible="False" />
+                            </Columns>
+                            <FooterStyle BackColor="#CCCCCC" ForeColor="Black" />
+                            <HeaderStyle BackColor="#000084" Font-Bold="True" ForeColor="White" />
+                            <PagerStyle BackColor="#999999" ForeColor="Black" HorizontalAlign="Center" />
+                            <RowStyle BackColor="#EEEEEE" ForeColor="Black" />
+                            <SelectedRowStyle BackColor="#008A8C" Font-Bold="True" ForeColor="White" />
+                            <SortedAscendingCellStyle BackColor="#F1F1F1" />
+                            <SortedAscendingHeaderStyle BackColor="#0000A9" />
+                            <SortedDescendingCellStyle BackColor="#CAC9C9" />
+                            <SortedDescendingHeaderStyle BackColor="#000065" />
+                        </asp:GridView>
+                        <asp:Label ID="lblTutorError" runat="server" Font-Size="Medium" 
+                            ForeColor="Black"></asp:Label>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; color: #FFFFFF; font-weight: bold; background-color: #006699;">
+                        &nbsp;<asp:DropDownList ID="DropDownListTutors" runat="server" 
+                            DataSourceID="SqlGetTutors" DataTextField="TutorName" 
+                            DataValueField="TutorID" Height="20px" Width="642px">
+                        </asp:DropDownList>
+                        &nbsp;<asp:LinkButton ID="lbAddTutor" runat="server" ForeColor="White" 
+                            onclick="lbAddTutor_Click">Add Tutor</asp:LinkButton>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; font-size: medium">
+                        <asp:LinkButton ID="LinkButtonRefresh" runat="server" 
+                            OnClick="LinkButtonRefresh_Click">Refresh Tutor List</asp:LinkButton>
+                    </td>
+                </tr>
+            </table>
+            <table style="width:100%;">
+                <tr>
+                    <td style="font-size: 17px; color: #FFFFFF; background-color: #006699; font-weight: bold; ">
+                        Location:</td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:SqlDataSource ID="SqlGetLocations" runat="server" 
+                            ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>" 
+                            SelectCommand="GetLocation" SelectCommandType="StoredProcedure"></asp:SqlDataSource>
+                        <asp:GridView ID="GridViewLocationDetails1" runat="server" 
+                            AutoGenerateColumns="False" BackColor="White" BorderColor="#999999" 
+                            BorderStyle="None" BorderWidth="1px" CellPadding="3" 
+                            DataKeyNames="ModuleID,LocationID" DataSourceID="SqlLocationDetails" 
+                            GridLines="Vertical" HorizontalAlign="Justify" ShowHeader="False" 
+                            Width="914px">
+                            <AlternatingRowStyle BackColor="#DCDCDC" />
+                            <Columns>
+                                <asp:CommandField ShowDeleteButton="True" />
+                                <asp:BoundField DataField="ModuleID" HeaderText="ModuleID" ReadOnly="True" 
+                                    SortExpression="ModuleID" Visible="False" />
+                                <asp:BoundField DataField="LocationID" HeaderText="LocationID" ReadOnly="True" 
+                                    SortExpression="LocationID" Visible="False" />
+                                <asp:BoundField DataField="LocationName" HeaderText="LocationName" 
+                                    ReadOnly="True" SortExpression="LocationName" />
+                            </Columns>
+                            <FooterStyle BackColor="#CCCCCC" ForeColor="Black" />
+                            <HeaderStyle BackColor="#000084" Font-Bold="True" ForeColor="White" />
+                            <PagerStyle BackColor="#999999" ForeColor="Black" HorizontalAlign="Center" />
+                            <RowStyle BackColor="#EEEEEE" ForeColor="Black" />
+                            <SelectedRowStyle BackColor="#008A8C" Font-Bold="True" ForeColor="White" />
+                            <SortedAscendingCellStyle BackColor="#F1F1F1" />
+                            <SortedAscendingHeaderStyle BackColor="#0000A9" />
+                            <SortedDescendingCellStyle BackColor="#CAC9C9" />
+                            <SortedDescendingHeaderStyle BackColor="#000065" />
+                        </asp:GridView>
+                        <asp:Label ID="lblLocationError" runat="server" Font-Size="Medium" 
+                            ForeColor="Black"></asp:Label>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; color: #FFFFFF; font-weight: bold; background-color: #006699;">
+                        <asp:DropDownList ID="DropDownListLocations" runat="server" 
+                            DataSourceID="SqlGetLocations" DataTextField="LocationName" 
+                            DataValueField="LocationID" Height="20px" Width="642px">
+                        </asp:DropDownList>
+                        &nbsp;<asp:LinkButton ID="lblAddTutors" runat="server" ForeColor="White" 
+                            onclick="lbAddLocation_Click">Add Location</asp:LinkButton>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; font-size: medium">
+                        <asp:LinkButton ID="LinkButtonRefresh1" runat="server" 
+                            OnClick="LinkButtonRefresh_Click">Refresh Location List</asp:LinkButton>
+                    </td>
+                </tr>
+            </table>
+            <table style="border-style: outset; border-width: 1px; width:100%;">
+                <tr>
+                    <td class="TemplateSubHeader" 
+                        style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                        <asp:CheckBox ID="cbCredit" runat="server" Checked="True" Visible="False" />
+                        Credit Rating:</td>
+                    <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                        <asp:TextBox ID="TextBoxCreditRating" runat="server" MaxLength="5" 
+                            Text='<%# Bind("CreditRating") %>'></asp:TextBox>
+                        <asp:RequiredFieldValidator ID="RequiredFieldValidator18" runat="server" 
+                            ControlToValidate="TextBoxCreditRating" ErrorMessage="*" ForeColor="Red"></asp:RequiredFieldValidator>
+                        <asp:RangeValidator ID="RangeValidator3" runat="server" 
+                            ControlToValidate="TextBoxCreditRating" 
+                            ErrorMessage="Range must be within 10-500" ForeColor="Red" MaximumValue="500" 
+                            MinimumValue="10" Type="Integer"></asp:RangeValidator>
+                    </td>
+                </tr>
+            </table>
+            <table style="border-style: outset; border-width: 1px; width:100%;">
+                <tr>
+                    <td class="TemplateSubHeader" 
+                        style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                        <asp:CheckBox ID="cbLevel" runat="server" Checked="True" Visible="False" />
+                        Level:</td>
+                    <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                        <asp:TextBox ID="TextBoxModuleRating" runat="server" MaxLength="20" 
+                            Text='<%# Bind("ModuleRating") %>'></asp:TextBox>
+                        <asp:RequiredFieldValidator ID="RequiredFieldValidator19" runat="server" 
+                            ControlToValidate="TextBoxModuleRating" ErrorMessage="*" ForeColor="Red"></asp:RequiredFieldValidator>
+                        <asp:RegularExpressionValidator ID="RegularExpressionValidator2" runat="server" 
+                            ControlToValidate="TextBoxModuleRating" 
+                            ErrorMessage="Must contain letters only." ForeColor="Red" 
+                            ValidationExpression="^[a-zA-Z]+$"></asp:RegularExpressionValidator>
+                    </td>
+                </tr>
+            </table>
+            <table style="width:100%;">
+                <tr>
+                    <td>
+                        &nbsp;</td>
+                </tr>
+            </table>
+            <table style="width:100%;">
+                <tr style="border-style: outset; border-width: 2px">
+                    <td class="TemplateSubHeader" 
+                        style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                        Module Type:</td>
+                    <td align="justify">
+                        <table style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE; width: 100%;">
+                            <tr>
+                                <td class="ModuleTypeLayout" style="border-style: outset; border-width: 2px">
+                                    Compulsory
+                                </td>
+                                <td style="border-style: outset; border-width: 2px">
+                                    <asp:TextBox ID="CompulsoryTextBox" runat="server" Height="25px" 
+                                        Text='<%# Bind("Compulsory") %>' TextMode="MultiLine" Width="381px" 
+                                        MaxLength="200" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ModuleTypeLayout" style="border-style: outset; border-width: 2px">
+                                    Core</td>
+                                <td style="border-style: outset; border-width: 2px">
+                                    <asp:TextBox ID="CoreTextBox" runat="server" Height="25px" 
+                                        Text='<%# Bind("Core") %>' TextMode="MultiLine" Width="381px" 
+                                        MaxLength="200" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ModuleTypeLayout" style="border-style: outset; border-width: 2px">
+                                    Optional</td>
+                                <td style="border-style: outset; border-width: 2px">
+                                    <asp:TextBox ID="OptionalTextBox" runat="server" Height="25px" 
+                                        Text='<%# Bind("Optional") %>' TextMode="MultiLine" Width="381px" 
+                                        MaxLength="200" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ModuleTypeLayout" style="border-style: outset; border-width: 2px">
+                                    Stand Alone</td>
+                                <td style="border-style: outset; border-width: 2px">
+                                    <asp:TextBox ID="StandAloneTextBox" runat="server" Height="25px" 
+                                        Text='<%# Bind("StandAlone") %>' TextMode="MultiLine" Width="381px" 
+                                        MaxLength="200" />
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        &nbsp;</td>
+                </tr>
+            </table>
+            <table style="border-style: outset; border-width: 2px; width:100%;">
+                <tr>
+                    <td class="TemplateSubHeader" 
+                        style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                        Learning Methods:</td>
+                    <td align="justify">
+                        <table style="width:100%;">
+                            <tr>
+                                <td align="justify">
+                                    <table style="width: 100%;">
+                                        <tr>
+                                            <td class="LearningMethodsEditLayout" 
+                                                style="border-style: outset; border-width: 2px">
+                                                Lecture</td>
+                                            <td class="style4" style="border-style: outset; border-width: 2px">
+                                                <asp:TextBox ID="LectureTextBox" runat="server" Text='<%# Bind("Lecture") %>' 
+                                                    Width="75px" MaxLength="6" />
+                                            </td>
+                                            <td>
+                                                <asp:RegularExpressionValidator ID="REELecture" runat="server" 
+                                                    ControlToValidate="LectureTextBox" ErrorMessage="Must contain numbers only." 
+                                                    Font-Size="12px" ForeColor="Red" ValidationExpression="^[0-9]+(\.[0-9][0-9]?)?"></asp:RegularExpressionValidator>
+                                                <asp:RequiredFieldValidator ID="RFVLecture" runat="server" 
+                                                    ControlToValidate="LectureTextBox" ErrorMessage="*" Font-Size="12px" 
+                                                    ForeColor="Red"></asp:RequiredFieldValidator>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="LearningMethodsEditLayout" 
+                                                style="border-style: outset; border-width: 2px">
+                                                Seminar</td>
+                                            <td class="style4" style="border-style: outset; border-width: 2px">
+                                                <asp:TextBox ID="SeminarTextBox" runat="server" Text='<%# Bind("Seminar") %>' 
+                                                    Width="75px" MaxLength="6" />
+                                            </td>
+                                            <td>
+                                                <asp:RegularExpressionValidator ID="REESeminar" runat="server" 
+                                                    ControlToValidate="SeminarTextBox" ErrorMessage="Must contain numbers only." 
+                                                    Font-Size="12px" ForeColor="Red" ValidationExpression="^[0-9]+(\.[0-9][0-9]?)?"></asp:RegularExpressionValidator>
+                                                <asp:RequiredFieldValidator ID="RFVSeminar" runat="server" 
+                                                    ControlToValidate="SeminarTextBox" ErrorMessage="*" Font-Size="12px" 
+                                                    ForeColor="Red"></asp:RequiredFieldValidator>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="LearningMethodsEditLayout" 
+                                                style="border-style: outset; border-width: 2px">
+                                                Tutorial And Project</td>
+                                            <td class="style4" style="border-style: outset; border-width: 2px">
+                                                <asp:TextBox ID="TutorialAndProjectTextBox" runat="server" 
+                                                    Text='<%# Bind("TutorialAndProject") %>' Width="75px" MaxLength="6" />
+                                            </td>
+                                            <td>
+                                                <asp:RegularExpressionValidator ID="REETutorial" runat="server" 
+                                                    ControlToValidate="TutorialAndProjectTextBox" 
+                                                    ErrorMessage="Must contain numbers only." Font-Size="12px" ForeColor="Red" 
+                                                    ValidationExpression="^[0-9]+(\.[0-9][0-9]?)?"></asp:RegularExpressionValidator>
+                                                <asp:RequiredFieldValidator ID="RFVTutorial" runat="server" 
+                                                    ControlToValidate="TutorialAndProjectTextBox" ErrorMessage="*" Font-Size="12px" 
+                                                    ForeColor="Red"></asp:RequiredFieldValidator>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="LearningMethodsEditLayout" 
+                                                style="border-style: outset; border-width: 2px">
+                                                Practical And Demonstrations</td>
+                                            <td class="style4" style="border-style: outset; border-width: 2px">
+                                                <asp:TextBox ID="PracticalAndDemonstrationsTextBox" runat="server" 
+                                                    Text='<%# Bind("PracticalAndDemonstrations") %>' Width="75px" 
+                                                    MaxLength="6" />
+                                            </td>
+                                            <td>
+                                                <asp:RegularExpressionValidator ID="REEPractical" runat="server" 
+                                                    ControlToValidate="PracticalAndDemonstrationsTextBox" 
+                                                    ErrorMessage="Must contain numbers only." Font-Size="12px" ForeColor="Red" 
+                                                    ValidationExpression="^[0-9]+(\.[0-9][0-9]?)?"></asp:RegularExpressionValidator>
+                                                <asp:RequiredFieldValidator ID="RFVPractical" runat="server" 
+                                                    ControlToValidate="PracticalAndDemonstrationsTextBox" ErrorMessage="*" 
+                                                    Font-Size="12px" ForeColor="Red"></asp:RequiredFieldValidator>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="LearningMethodsEditLayout" 
+                                                style="border-style: outset; border-width: 2px">
+                                                Studio And Workshop</td>
+                                            <td class="style4" style="border-style: outset; border-width: 2px">
+                                                <asp:TextBox ID="StudioAndWorkshopTextBox" runat="server" 
+                                                    Text='<%# Bind("StudioAndWorkshop") %>' Width="75px" MaxLength="6" />
+                                            </td>
+                                            <td>
+                                                <asp:RegularExpressionValidator ID="REEStudio" runat="server" 
+                                                    ControlToValidate="StudioAndWorkshopTextBox" 
+                                                    ErrorMessage="Must contain numbers only." Font-Size="12px" ForeColor="Red" 
+                                                    ValidationExpression="^[0-9]+(\.[0-9][0-9]?)?"></asp:RegularExpressionValidator>
+                                                <asp:RequiredFieldValidator ID="RFVStudio" runat="server" 
+                                                    ControlToValidate="StudioAndWorkshopTextBox" ErrorMessage="*" Font-Size="12px" 
+                                                    ForeColor="Red"></asp:RequiredFieldValidator>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="LearningMethodsEditLayout" 
+                                                style="border-style: outset; border-width: 2px">
+                                                Fieldwork And External</td>
+                                            <td class="style4" style="border-style: outset; border-width: 2px">
+                                                <asp:TextBox ID="FieldworkAndExternalTextBox" runat="server" 
+                                                    Text='<%# Bind("FieldworkAndExternal") %>' Width="75px" MaxLength="6" />
+                                            </td>
+                                            <td>
+                                                <asp:RegularExpressionValidator ID="REEFeildwork" runat="server" 
+                                                    ControlToValidate="FieldworkAndExternalTextBox" 
+                                                    ErrorMessage="Must contain numbers only." Font-Size="12px" ForeColor="Red" 
+                                                    ValidationExpression="^[0-9]+(\.[0-9][0-9]?)?"></asp:RegularExpressionValidator>
+                                                <asp:RequiredFieldValidator ID="RFVFieldwork" runat="server" 
+                                                    ControlToValidate="FieldworkAndExternalTextBox" ErrorMessage="*" 
+                                                    Font-Size="12px" ForeColor="Red"></asp:RequiredFieldValidator>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="LearningMethodsEditLayout" 
+                                                style="border-style: outset; border-width: 2px">
+                                                Workbased Learning</td>
+                                            <td class="style4" style="border-style: outset; border-width: 2px">
+                                                <asp:TextBox ID="WorkbasedLearningTextBox" runat="server" 
+                                                    Text='<%# Bind("WorkbasedLearning") %>' Width="75px" MaxLength="6" />
+                                            </td>
+                                            <td>
+                                                <asp:RegularExpressionValidator ID="REEWorkbased" runat="server" 
+                                                    ControlToValidate="WorkbasedLearningTextBox" 
+                                                    ErrorMessage="Must contain numbers only." Font-Size="12px" ForeColor="Red" 
+                                                    ValidationExpression="^[0-9]+(\.[0-9][0-9]?)?"></asp:RegularExpressionValidator>
+                                                <asp:RequiredFieldValidator ID="RVFWorkbased" runat="server" 
+                                                    ControlToValidate="WorkbasedLearningTextBox" ErrorMessage="*" Font-Size="12px" 
+                                                    ForeColor="Red"></asp:RequiredFieldValidator>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="LearningMethodsEditLayout" 
+                                                style="border-style: outset; border-width: 2px">
+                                                Placement</td>
+                                            <td class="style4" style="border-style: outset; border-width: 2px">
+                                                <asp:TextBox ID="PlacementTextBox" runat="server" 
+                                                    Text='<%# Bind("Placement") %>' Width="75px" MaxLength="6" />
+                                            </td>
+                                            <td>
+                                                <asp:RegularExpressionValidator ID="REEPlacement" runat="server" 
+                                                    ControlToValidate="PlacementTextBox" ErrorMessage="Must contain numbers only." 
+                                                    Font-Size="12px" ForeColor="Red" ValidationExpression="^[0-9]+(\.[0-9][0-9]?)?"></asp:RegularExpressionValidator>
+                                                <asp:RequiredFieldValidator ID="RFVPlacement" runat="server" 
+                                                    ControlToValidate="PlacementTextBox" ErrorMessage="*" Font-Size="12px" 
+                                                    ForeColor="Red"></asp:RequiredFieldValidator>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="LearningMethodsEditLayout" 
+                                                style="border-style: outset; border-width: 2px">
+                                                Independent Study</td>
+                                            <td class="style4" style="border-style: outset; border-width: 2px">
+                                                <asp:TextBox ID="IndependentStudyTextBox" runat="server" 
+                                                    style="margin-top: 0px" Text='<%# Bind("IndependentStudy") %>' 
+                                                    Width="75px" MaxLength="6" />
+                                            </td>
+                                            <td>
+                                                <asp:RegularExpressionValidator ID="REEIndependant" runat="server" 
+                                                    ControlToValidate="IndependentStudyTextBox" 
+                                                    ErrorMessage="Must contain numbers only." Font-Size="12px" ForeColor="Red" 
+                                                    ValidationExpression="^[0-9]+(\.[0-9][0-9]?)?"></asp:RegularExpressionValidator>
+                                                <asp:RequiredFieldValidator ID="RFVIndependent" runat="server" 
+                                                    ControlToValidate="IndependentStudyTextBox" ErrorMessage="*" Font-Size="12px" 
+                                                    ForeColor="Red"></asp:RequiredFieldValidator>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <asp:Panel ID="TotalHourPanelInEdit" runat="server" Visible="False">
+                                        Total Hours
+                                        <asp:TextBox ID="TotalHoursTextBox" runat="server" Enabled="False" 
+                                            Text='<%# Bind("TotalHours") %>' Width="75px" />
+                                    </asp:Panel>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <table style="width:100%;">
+                <tr>
+                    <td>
+                        &nbsp;</td>
+                </tr>
+            </table>
+            <table style="width: 100%;">
+                <tr style="border-style: outset; border-width: 2px">
+                    <td class="TemplateSubHeader" 
+                        style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                        Pre-Requisite/s</td>
+                    <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                        <asp:TextBox ID="Pre_RequisitesTextBox" runat="server" Height="30px" 
+                            Text='<%# Bind("Pre_Requisites") %>' TextMode="MultiLine" Width="547px" 
+                            MaxLength="1000" />
+                    </td>
+                </tr>
+                <tr style="border-style: outset; border-width: 2px">
+                    <td class="TemplateSubHeader" 
+                        style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                        Recommended Prior Study:</td>
+                    <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                        <asp:TextBox ID="R_P_STextBox" runat="server" Height="30px" 
+                            Text='<%# Bind("R_P_S") %>' TextMode="MultiLine" Width="547px" 
+                            MaxLength="1000" />
+                    </td>
+                </tr>
+                <tr style="border-style: outset; border-width: 2px">
+                    <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                        Co-Requisite/s</td>
+                    <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                        <asp:TextBox ID="Co_RequisitesTextBox" runat="server" Height="30px" 
+                            Text='<%# Bind("Co_Requisites") %>' TextMode="MultiLine" Width="547px" 
+                            MaxLength="1000" />
+                    </td>
+                </tr>
+                <tr style="border-style: outset; border-width: 2px">
+                    <td class="TemplateSubHeader" 
+                        style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                        Shared Teaching:</td>
+                    <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                        <asp:TextBox ID="SharedTeachingTextBox" runat="server" Height="30px" 
+                            Text='<%# Bind("SharedTeaching") %>' TextMode="MultiLine" Width="547px" 
+                            MaxLength="1000" />
+                    </td>
+                </tr>
+                <tr style="border-style: outset; border-width: 2px">
+                    <td class="TemplateSubHeader" 
+                        style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                        Professional Body Requirement:</td>
+                    <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                        <asp:TextBox ID="P_B_RTextBox" runat="server" Height="30px" 
+                            Text='<%# Bind("P_B_R") %>' TextMode="MultiLine" Width="547px" 
+                            MaxLength="1000" />
+                    </td>
+                </tr>
+                <tr style="border-style: outset; border-width: 2px">
+                    <td class="TemplateSubHeader" 
+                        style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                        Graded or not Graded:</td>
+                    <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                        <asp:TextBox ID="GradedTextBox" runat="server" Height="30px" 
+                            Text='<%# Bind("Graded") %>' TextMode="MultiLine" Width="547px" 
+                            MaxLength="1000" />
+                    </td>
+                </tr>
+                <tr style="border-style: outset; border-width: 2px">
+                    <td class="TemplateSubHeader" 
+                        style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                        Barred Combination:</td>
+                    <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                        <asp:TextBox ID="BarredCombinationTextBox" runat="server" Height="30px" 
+                            Text='<%# Bind("BarredCombination") %>' TextMode="MultiLine" Width="547px" 
+                            MaxLength="1000" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        &nbsp;</td>
+                </tr>
+            </table>
+            <table style="border-style: outset; border-width: 2px; width:100%;">
+                <tr>
+                    <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699; text-align: center;">
+                        Module Synopsis</td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:TextBox ID="SynopsisTextBox" runat="server" Height="100px" 
+                            Text='<%# Bind("Synopsis") %>' TextMode="MultiLine" Width="900px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699; text-align: center;">
+                        Module Syllabus</td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:TextBox ID="SyllabusTextBox" runat="server" Height="100px" 
+                            Text='<%# Bind("Syllabus") %>' TextMode="MultiLine" Width="900px" />
+                    </td>
+                </tr>
+            </table>
+            <table style="width: 100%;">
+                <tr>
+                    <td>
+                        &nbsp;</td>
+                </tr>
+            </table>
+            <table style="border-style: outset; border-width: 2px; width: 100%;">
+                <tr>
+                    <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699; text-align: center;">
+                        Learning Outcomes</td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:TextBox ID="LearningOutcomesTextBox" runat="server" Height="55px" 
+                            Text='<%# Bind("LearningOutcomes") %>' TextMode="MultiLine" 
+                            Width="900px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-family: Calibri; font-size: 17.5px; color: #FFFFFF; background-color: #006699;">
+                        Knowledge &amp; Understanding</td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:TextBox ID="KnowledgeTextBox" runat="server" Height="100px" 
+                            Text='<%# Bind("Knowledge") %>' TextMode="MultiLine" Width="900px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-family: Calibri; font-size: 17.5px; color: #FFFFFF; background-color: #006699;">
+                        Abilities</td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:TextBox ID="AbilitiesTextBox" runat="server" Height="100px" 
+                            Text='<%# Bind("Abilities") %>' TextMode="MultiLine" Width="900px" />
+                    </td>
+                </tr>
+            </table>
+            <table style="width: 100%;">
+                <tr>
+                    <td>
+                        &nbsp;</td>
+                </tr>
+            </table>
+            <table style="border-style: outset; border-width: 2px; width: 100%;">
+                <tr>
+                    <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699; text-align: center;">
+                        Assessment Strategy</td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:TextBox ID="AssessmentStrategyTextBox" runat="server" Height="55px" 
+                            Text='<%# Bind("AssessmentStrategy") %>' TextMode="MultiLine" 
+                            Width="900px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-family: Calibri; font-size: 17.5px; color: #FFFFFF; background-color: #006699;">
+                        Formative</td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:TextBox ID="FormativeTextBox" runat="server" Height="100px" 
+                            Text='<%# Bind("Formative") %>' TextMode="MultiLine" Width="900px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-family: Calibri; font-size: 17.5px; color: #FFFFFF; background-color: #006699;">
+                        Summative</td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:TextBox ID="SummativeTextBox" runat="server" Height="100px" 
+                            Text='<%# Bind("Summative") %>' TextMode="MultiLine" Width="900px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-family: Calibri; font-size: 17.5px; color: #FFFFFF; background-color: #006699;">
+                        Tasks/Weighting</td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:TextBox ID="TasksTextBox" runat="server" Height="100px" 
+                            Text='<%# Bind("Tasks") %>' TextMode="MultiLine" Width="900px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-family: Calibri; font-size: 17.5px; color: #FFFFFF; background-color: #006699;">
+                        Assessment Table</td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:GridView ID="GridViewAssessmentTable1" runat="server" 
+                            AutoGenerateColumns="False" BorderColor="#999999" BorderStyle="None" 
+                            BorderWidth="1px" CellPadding="3" DataKeyNames="SummativeID" 
+                            DataSourceID="SqlAssessmentTable" GridLines="Vertical" 
+                            Width="900px">
+                            <AlternatingRowStyle BackColor="#DCDCDC" />
+                            <Columns>
+                                <asp:TemplateField ShowHeader="False">
+                                    <ItemTemplate>
+                                        <asp:LinkButton ID="LinkButton1" runat="server" CausesValidation="False" 
+                                            CommandName="Delete" Text="Delete"></asp:LinkButton>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:BoundField DataField="SummativeID" HeaderText="SummativeID" 
+                                    InsertVisible="False" ReadOnly="True" SortExpression="SummativeID" 
+                                    Visible="False" />
+                                <asp:TemplateField HeaderText="Assessment Type" SortExpression="AssessmentType">
+                                    <EditItemTemplate>
+                                        <asp:TextBox ID="TextBox1" runat="server" Text='<%# Bind("AssessmentType") %>'></asp:TextBox>
+                                    </EditItemTemplate>
+                                    <HeaderTemplate>
+                                        Assessment Type<br />
+                                    </HeaderTemplate>
+                                    <ItemTemplate>
+                                        <asp:Label ID="Label1" runat="server" Text='<%# Bind("AssessmentType") %>'></asp:Label>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="Learning Outcomes" SortExpression="LO">
+                                    <EditItemTemplate>
+                                        <asp:TextBox ID="TextBox2" runat="server" Text='<%# Bind("LO") %>'></asp:TextBox>
+                                    </EditItemTemplate>
+                                    <HeaderTemplate>
+                                        Learning Outcomes
+                                    </HeaderTemplate>
+                                    <ItemTemplate>
+                                        <asp:Label ID="Label2" runat="server" Text='<%# Bind("LO") %>'></asp:Label>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="Summary" SortExpression="Summary">
+                                    <EditItemTemplate>
+                                        <asp:TextBox ID="TextBox3" runat="server" Text='<%# Bind("Summary") %>'></asp:TextBox>
+                                    </EditItemTemplate>
+                                    <HeaderTemplate>
+                                        Summary
+                                    </HeaderTemplate>
+                                    <ItemTemplate>
+                                        <asp:Label ID="Label3" runat="server" Text='<%# Bind("Summary") %>'></asp:Label>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="Component" SortExpression="Component">
+                                    <EditItemTemplate>
+                                        <asp:TextBox ID="TextBox4" runat="server" Text='<%# Bind("Component") %>'></asp:TextBox>
+                                    </EditItemTemplate>
+                                    <HeaderTemplate>
+                                        Component
+                                    </HeaderTemplate>
+                                    <ItemTemplate>
+                                        <asp:Label ID="Label4" runat="server" Text='<%# Bind("Component") %>'></asp:Label>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="FE" SortExpression="FE">
+                                    <EditItemTemplate>
+                                        <asp:CheckBox ID="CheckBox1" runat="server" Checked='<%# Bind("FE") %>' />
+                                    </EditItemTemplate>
+                                    <HeaderTemplate>
+                                        FE<br />
+                                    </HeaderTemplate>
+                                    <ItemTemplate>
+                                        <asp:CheckBox ID="CheckBox4" runat="server" Checked='<%# Bind("FE") %>' 
+                                            Enabled="false" />
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="TR" SortExpression="TR">
+                                    <EditItemTemplate>
+                                        <asp:CheckBox ID="CheckBox2" runat="server" Checked='<%# Bind("TR") %>' />
+                                    </EditItemTemplate>
+                                    <HeaderTemplate>
+                                        TR<br />
+                                    </HeaderTemplate>
+                                    <ItemTemplate>
+                                        <asp:CheckBox ID="CheckBox5" runat="server" Checked='<%# Bind("TR") %>' 
+                                            Enabled="false" />
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:TemplateField HeaderText="AM" SortExpression="AM">
+                                    <EditItemTemplate>
+                                        <asp:CheckBox ID="CheckBox3" runat="server" Checked='<%# Bind("AM") %>' />
+                                    </EditItemTemplate>
+                                    <HeaderTemplate>
+                                        AM
+                                    </HeaderTemplate>
+                                    <ItemTemplate>
+                                        <asp:CheckBox ID="CheckBox6" runat="server" Checked='<%# Bind("AM") %>' 
+                                            Enabled="false" />
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:BoundField DataField="AssessmentID" HeaderText="AssessmentID" 
+                                    SortExpression="AssessmentID" Visible="False" />
+                            </Columns>
+                            <EmptyDataTemplate>
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td style="text-align: center">
+                                            NO DATA IN THIS SECTION</td>
+                                    </tr>
+                                </table>
+                            </EmptyDataTemplate>
+                            <FooterStyle BackColor="#CCCCCC" ForeColor="Black" />
+                            <HeaderStyle BackColor="#006699" Font-Bold="True" ForeColor="White" 
+                                VerticalAlign="Middle" />
+                            <PagerStyle BackColor="#999999" ForeColor="Black" HorizontalAlign="Center" />
+                            <RowStyle BackColor="#EEEEEE" ForeColor="Black" />
+                            <SelectedRowStyle BackColor="#008A8C" Font-Bold="True" ForeColor="White" />
+                            <SortedAscendingCellStyle BackColor="#F1F1F1" />
+                            <SortedAscendingHeaderStyle BackColor="#0000A9" />
+                            <SortedDescendingCellStyle BackColor="#CAC9C9" />
+                            <SortedDescendingHeaderStyle BackColor="#000065" />
+                        </asp:GridView>
+                        <asp:FormView ID="FormViewInsertAssessment" runat="server" 
+                            DataKeyNames="SummativeID" DataSourceID="SqlAssessmentTable" 
+                            Height="39px" HorizontalAlign="Center" 
+                            ondatabound="FormViewInsertAssessment_DataBound" style="margin-right: 3px" 
+                            Width="900px">
+                            <EmptyDataTemplate>
+                                <table style="width: 100%; margin-top: 0px;">
+                                    <tr>
+                                        <td align="center">
+                                            <asp:LinkButton ID="NewButton0" runat="server" CausesValidation="False" 
+                                                CommandName="New" Font-Bold="True" Font-Size="Medium" 
+                                                Text="Add new Assessment to the table" />
+                                        </td>
+                                    </tr>
+                                </table>
+                            </EmptyDataTemplate>
+                            <InsertItemTemplate>
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td style="color: #FFFF00">
+                                            Assessment Type<br />
+                                        </td>
+                                        <td style="color: #FFFF00">
+                                            Learning Outcomes</td>
+                                        <td style="color: #FFFF00">
+                                            Summary</td>
+                                        <td style="color: #FFFF00">
+                                            Component</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <asp:TextBox ID="TextBoxType" runat="server" MaxLength="100" Width="120px"></asp:TextBox>
+                                            <br />
+                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator11" runat="server" 
+                                                ControlToValidate="TextBoxType" ErrorMessage="* Required" ForeColor="#FF3300"></asp:RequiredFieldValidator>
+                                        </td>
+                                        <td>
+                                            <asp:TextBox ID="TextBoxLO" runat="server" MaxLength="50" Width="120px"></asp:TextBox>
+                                            <br />
+                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator12" runat="server" 
+                                                ControlToValidate="TextBoxLO" ErrorMessage="* Required" ForeColor="#FF3300"></asp:RequiredFieldValidator>
+                                        </td>
+                                        <td>
+                                            <asp:TextBox ID="TextBoxSummary" runat="server" Height="62px" MaxLength="2000" 
+                                                TextMode="MultiLine" Width="229px"></asp:TextBox>
+                                            <br />
+                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator13" runat="server" 
+                                                ControlToValidate="TextBoxSummary" ErrorMessage="* Required" 
+                                                ForeColor="#FF3300"></asp:RequiredFieldValidator>
+                                        </td>
+                                        <td>
+                                            <asp:TextBox ID="TextBoxComponent" runat="server" MaxLength="50" Width="120px"></asp:TextBox>
+                                            <br />
+                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator14" runat="server" 
+                                                ControlToValidate="TextBoxComponent" ErrorMessage="* Required" 
+                                                ForeColor="#FF3300"></asp:RequiredFieldValidator>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td style="color: #FFFF00">
+                                            Final Element</td>
+                                        <td style="color: #FFFF00">
+                                            Tutor Reassessment</td>
+                                        <td style="color: #FFFF00">
+                                            Anonymous Marking</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color: #FFFF00">
+                                            <asp:RadioButtonList ID="CheckBoxFE" runat="server" 
+                                                RepeatDirection="Horizontal" RepeatLayout="Flow">
+                                                <asp:ListItem Value="True">Yes</asp:ListItem>
+                                                <asp:ListItem Value="False">No</asp:ListItem>
+                                            </asp:RadioButtonList>
+                                            <br />
+                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator15" runat="server" 
+                                                ControlToValidate="CheckBoxFE" ErrorMessage="* Required" ForeColor="#FF3300"></asp:RequiredFieldValidator>
+                                        </td>
+                                        <td style="color: #FFFF00">
+                                            <asp:RadioButtonList ID="CheckBoxTR" runat="server" 
+                                                RepeatDirection="Horizontal" RepeatLayout="Flow">
+                                                <asp:ListItem Value="True">Yes</asp:ListItem>
+                                                <asp:ListItem Value="False">No</asp:ListItem>
+                                            </asp:RadioButtonList>
+                                            <br />
+                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator16" runat="server" 
+                                                ControlToValidate="CheckBoxTR" ErrorMessage="* Required" ForeColor="#FF3300"></asp:RequiredFieldValidator>
+                                        </td>
+                                        <td style="color: #FFFF00">
+                                            <asp:RadioButtonList ID="CheckBoxAM" runat="server" 
+                                                RepeatDirection="Horizontal" RepeatLayout="Flow">
+                                                <asp:ListItem Value="True">Yes</asp:ListItem>
+                                                <asp:ListItem Value="False">No</asp:ListItem>
+                                            </asp:RadioButtonList>
+                                            <br />
+                                            <asp:RequiredFieldValidator ID="RequiredFieldValidator17" runat="server" 
+                                                ControlToValidate="CheckBoxAM" ErrorMessage="* Required" ForeColor="#FF3300"></asp:RequiredFieldValidator>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <asp:LinkButton ID="lblInsertTable" runat="server" Font-Overline="False" 
+                                    Font-Underline="True" ForeColor="White" onclick="lblInsertTable_Click">Insert</asp:LinkButton>
+                                &nbsp;<asp:LinkButton ID="InsertCancelButton" runat="server" 
+                                    CausesValidation="False" CommandName="Cancel" ForeColor="White" Text="Cancel"></asp:LinkButton>
+                            </InsertItemTemplate>
+                            <InsertRowStyle BackColor="#006699" />
+                            <ItemTemplate>
+                                <table style="width: 100%; margin-top: 0px;">
+                                    <tr>
+                                        <td align="center">
+                                            <asp:LinkButton ID="NewButton1" runat="server" CausesValidation="False" 
+                                                CommandName="New" Font-Bold="True" Font-Size="Medium" 
+                                                Text="Add New Assessment To The Table" />
+                                        </td>
+                                    </tr>
+                                </table>
+                            </ItemTemplate>
+                        </asp:FormView>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-family: Calibri; font-size: 17.5px; color: #FFFFFF; background-color: #006699;">
+                        Assessment Strategy</td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:TextBox ID="CriteriaTextBox" runat="server" Height="100px" 
+                            Text='<%# Bind("Criteria") %>' TextMode="MultiLine" Width="900px" />
+                    </td>
+                </tr>
+            </table>
+            <table style="width: 100%;">
+                <tr>
+                    <td>
+                        &nbsp;</td>
+                </tr>
+            </table>
+            <table style="border-style: outset; border-width: 2px; width: 100%;">
+                <tr>
+                    <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699; text-align: center;">
+                        Learning Strategy</td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:TextBox ID="StrategyTextBox" runat="server" Height="100px" 
+                            Text='<%# Bind("Strategy") %>' TextMode="MultiLine" Width="900px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699; text-align: center;">
+                        Resources Required</td>
+                </tr>
+                <tr>
+                    <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                        <asp:TextBox ID="ResourcesRequiredTextBox" runat="server" Height="50px" 
+                            Text='<%# Bind("ResourcesRequired") %>' TextMode="MultiLine" 
+                            Width="900px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699; text-align: center;">
+                        Reading List</td>
+                </tr>
+                <tr>
+                    <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                        <asp:TextBox ID="ReadingListTextBox" runat="server" 
+                            Text='<%# Bind("ReadingList") %>' Width="900px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699; text-align: center;">
+                        Approved</td>
+                </tr>
+                <tr>
+                    <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                        <asp:TextBox ID="TextBoxApproved" runat="server" Height="50px" 
+                            Text='<%# Bind("Approved") %>' TextMode="MultiLine" Width="900px"></asp:TextBox>
+                    </td>
+                </tr>
+            </table>
+            <table style="width: 100%;">
+                <tr>
+                    <td>
+                        &nbsp;</td>
+                </tr>
+            </table>
+            <table style="border-width: 2px; border-style: outset; width: 100%;">
+                <tr>
+                    <td colspan="2" 
+                        style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699; text-align: center;">
+                        Extra Information</td>
+                </tr>
+                <tr style="border-width: 2px; border-style: outset;">
+                    <td class="TemplateSubHeader" 
+                        style="font-family: Calibri; font-size: 17.5px; color: #FFFFFF; background-color: #006699;">
+                        Module Scheme</td>
+                    <td>
+                        <asp:TextBox ID="ModuleSchemeTextBox" runat="server" Height="30px" 
+                            Text='<%# Bind("ModuleScheme") %>' TextMode="MultiLine" Width="526px" />
+                    </td>
+                </tr>
+                <tr style="border-style: outset; border-width: 2px">
+                    <td style="font-family: Calibri; font-size: 17.5px; color: #FFFFFF; background-color: #006699;">
+                        Module Status</td>
+                    <td>
+                        <asp:TextBox ID="ModuleStatusTextBox" runat="server" Height="30px" 
+                            Text='<%# Bind("ModuleStatus") %>' TextMode="MultiLine" Width="526px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" 
+                        style="font-family: Calibri; font-size: 17.5px; color: #FFFFFF; background-color: #006699;">
+                        Module Aims</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="background-color: #EEEEEE;">
+                        <asp:TextBox ID="ModuleAimsTextBox" runat="server" Height="100px" 
+                            Text='<%# Bind("ModuleAims") %>' TextMode="MultiLine" Width="900px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" 
+                        style="font-family: Calibri; font-size: 17.5px; color: #FFFFFF; background-color: #006699;">
+                        Other Information</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="background-color: #EEEEEE;">
+                        <asp:TextBox ID="OtherInfoTextBox" runat="server" Height="100px" 
+                            Text='<%# Bind("OtherInfo") %>' TextMode="MultiLine" Width="900px" />
+                    </td>
+                </tr>
+            </table>
+            <asp:Button ID="UpdateButton" runat="server" CausesValidation="True" 
+                CommandName="Update" Height="26px" Text="Update" />
+            <asp:Button ID="UpdateCancelButton" runat="server" CausesValidation="False" 
+                CommandName="Cancel" Text="Cancel" />
+            <br />
+        </EditItemTemplate>
+        <ItemTemplate>
+            <table style="width:100%;">
+                <tr style="font-family: Calibri; font-size: 25px; color: #FFFFFF; font-weight: bold; background-color: #006699;">
+                    <td align="center" class="TemplateHeader">
+                        <asp:Label ID="lblTemplateTitle" runat="server" Font-Bold="True" 
+                            Font-Size="X-Large" Font-Underline="True" Text="MODULE SPECIFICIATION"></asp:Label>
+                    </td>
+                    <td style="font-family: Calibri; font-size: 20px">
+                        <asp:Button ID="EditButton" runat="server" CausesValidation="False" 
+                            CommandName="Edit" Text="Edit" Width="60px" />
+                    </td>
+                </tr>
+            </table>
+            <br />
+                    <table style="width: 100%;">
+                <tr>
+                    <td class="TemplateSubHeader" 
+                        style="font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                        Module Code:</td>
+                    <td style="font-size: 17.5px; font-family: Calibri; color: #000000;">
+                        <asp:Label ID="ModuleCodeLabel" runat="server" 
+                            Text='<%# Bind("ModuleCode") %>' />
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <table style="width:100%; font-weight: bold; font-size: 11pt;">
+                <tr>
+                    <td class="TemplateSubHeader" 
+                        style="font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                        Module Title:</td>
+                    <td class="style16">
+                        <asp:Label ID="ModuleTitleLabel" runat="server" 
+                            Text='<%# Bind("ModuleTitle") %>' />
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <asp:Panel ID="SchoolPanel" runat="server">
+                <table style="width:100%; font-weight: bold; font-size: 11pt;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            School/s Involved In Delivery:</td>
+                        <td>
+                            <asp:Label ID="SchoolNameLabel" runat="server" 
+                                Text='<%# Bind("SchoolName") %>' />
+                        </td>
+                    </tr>
+                </table>
+                <br />
+            </asp:Panel>
+            <asp:Panel ID="PanelScheme" runat="server" Visible='<%#Eval("ModuleScheme")!=DBNull.Value%>'>
+                <table style="width:100%; font-weight: bold; font-size: 11pt;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Module Scheme:</td>
+                        <td class="style19">
+                            <asp:Label ID="ModuleSchemeLabel" runat="server" 
+                                Text='<%# Eval("ModuleScheme") %>' />
+                        </td>
+                    </tr>
+                </table>
+                <br />
+            </asp:Panel>
+            <asp:Panel ID="CoursePanel" runat="server" Width="914px">
+                <table style="width:100%; font-weight: bold; font-size: 11pt;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            <asp:CheckBox ID="cbCourses" runat="server" Visible="False" />
+                            Name of Course(s):</td>
+                        <td align="justify">
+                            <asp:GridView ID="GridViewCourseDetails" runat="server" 
+                                AutoGenerateColumns="False" 
+                                DataKeyNames="ModuleID,CourseID" DataSourceID="SqlCourseDetails" 
+                                GridLines="None" ShowHeader="False" Width="536px">
+                                <Columns>
+                                    <asp:BoundField DataField="ModuleID" HeaderText="ModuleID" ReadOnly="True" 
+                                        SortExpression="ModuleID" Visible="False" />
+                                    <asp:BoundField DataField="CourseID" HeaderText="CourseID" ReadOnly="True" 
+                                        SortExpression="CourseID" Visible="False" />
+                                    <asp:BoundField DataField="CourseName" HeaderText="CourseName" ReadOnly="True" 
+                                        SortExpression="CourseName" />
+                                </Columns>
+                            </asp:GridView>
+                        </td>
+                    </tr>
+                </table>
+                <br />
+            </asp:Panel>
+            <asp:Panel ID="TutorPanel" runat="server" Width="914px">
+                <table style="width:100%; font-weight: bold; font-size: 11pt;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            <asp:CheckBox ID="cbTutors" runat="server" Visible="False" />
+                            Module Leader:</td>
+                        <td align="justify">
+                            <asp:GridView ID="GridViewTutorDetails" runat="server" 
+                                AutoGenerateColumns="False" 
+                                DataKeyNames="ModuleID,TutorID" DataSourceID="SqlTutorDetails" 
+                                GridLines="None" ShowHeader="False" Width="536px">
+                                <Columns>
+                                    <asp:BoundField DataField="ModuleID" HeaderText="ModuleID" ReadOnly="True" 
+                                        SortExpression="ModuleID" Visible="False" />
+                                    <asp:BoundField DataField="TutorID" HeaderText="TutorID" ReadOnly="True" 
+                                        SortExpression="TutorID" Visible="False" />
+                                    <asp:BoundField DataField="DeptID" HeaderText="DeptID" SortExpression="DeptID" 
+                                        Visible="False" />
+                                    <asp:BoundField DataField="ModuleLeader" HeaderText="ModuleLeader" 
+                                        SortExpression="ModuleLeader" />
+                                    <asp:TemplateField HeaderText="TutorLogin" SortExpression="TutorLogin" 
+                                        Visible="False">
+                                        <ItemTemplate>
+                                            <asp:Label ID="Label1" runat="server" Text='<%# Bind("TutorLogin") %>'></asp:Label>
+                                        </ItemTemplate>
+                                        <EditItemTemplate>
+                                            <asp:TextBox ID="TextBox1" runat="server" Text='<%# Bind("TutorLogin") %>'></asp:TextBox>
+                                        </EditItemTemplate>
+                                    </asp:TemplateField>
+                                </Columns>
+                            </asp:GridView>
+                        </td>
+                    </tr>
+                </table>
+                <br />
+            </asp:Panel>
+            <asp:Panel ID="LocationPanel" runat="server" Width="914px">
+                <table style="width:100%; font-weight: bold; font-size: 11pt;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            <asp:CheckBox ID="cbLocation" runat="server" Visible="False" />
+                            Location:</td>
+                        <td>
+                            <asp:GridView ID="GridViewLocationDetails" runat="server" 
+                                AutoGenerateColumns="False" 
+                                DataKeyNames="ModuleID,LocationID" 
+                                DataSourceID="SqlLocationDetails" ShowHeader="False" 
+                                Width="536px" GridLines="None">
+                                <Columns>
+                                    <asp:BoundField DataField="ModuleID" HeaderText="ModuleID" ReadOnly="True" 
+                                        SortExpression="ModuleID" Visible="False" />
+                                    <asp:BoundField DataField="LocationID" HeaderText="LocationID" ReadOnly="True" 
+                                        SortExpression="LocationID" Visible="False" />
+                                    <asp:BoundField DataField="LocationName" HeaderText="LocationName" 
+                                        ReadOnly="True" SortExpression="LocationName" />
+                                </Columns>
+                            </asp:GridView>
+                        </td>
+                    </tr>
+                </table>
+                <br />
+            </asp:Panel>
+            <asp:Panel ID="StatusPanel" runat="server" Visible='<%#Eval("ModuleStatus")!=DBNull.Value%>'>
+                <table style="width:100%; font-weight: bold; font-size: 11pt;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Module Status:</td>
+                        <td>
+                            <asp:Label ID="ModuleStatusLabel" runat="server" 
+                                Text='<%# Bind("ModuleStatus") %>' />
+                        </td>
+                    </tr>
+                </table>
+                <br />
+            </asp:Panel>
+            <table style="width:100%; font-weight: bold; font-size: 11pt;">
+                <tr>
+                    <td class="TemplateSubHeader" 
+                        style="font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                        Module Type:</td>
+                    <td align="justify">
+                        <asp:Panel ID="CompulsoryPanel" runat="server"
+                                    Visible='<%#Eval("Compulsory")!=DBNull.Value%>'>
+                            <asp:Label ID="CompulsoryLabel" runat="server" 
+                                Text='<%# Bind("Compulsory") %>' />
+                        </asp:Panel>
+                        <asp:Panel ID="CorePanel" runat="server" 
+                                    Visible='<%#Eval("Core")!=DBNull.Value%>'>
+                            <asp:Label ID="CoreLabel" runat="server" 
+                                Text='<%# Bind("Core") %>' />
+                        </asp:Panel>
+                        <asp:Panel ID="OptionalPanel" runat="server"
+                                    Visible='<%#Eval("Optional")!=DBNull.Value%>'>
+                            <asp:Label ID="OptionalLabel" runat="server" 
+                                Text='<%# Bind("Optional") %>' />
+                        </asp:Panel>
+                        <asp:Panel ID="StandPanel" runat="server"
+                                    Visible='<%#Eval("StandAlone")!=DBNull.Value%>'>
+                            <asp:Label ID="StandAloneLabel" runat="server" 
+                                Text='<%# Bind("StandAlone") %>' />
+                        </asp:Panel>
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <table style="width:100%; font-weight: bold; font-size: 11pt;">
+                <tr>
+                    <td class="TemplateSubHeader" 
+                        style="font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                        Level:</td>
+                    <td>
+                        <asp:Label ID="ModuleRatingLabel" runat="server" 
+                            Text='<%# Bind("ModuleRating") %>' />
+                    </td>
+                </tr>
+            </table>
+            <table style="width:100%; font-weight: bold; font-size: 11pt;">
+                <tr>
+                    <td class="TemplateSubHeader" 
+                        style="font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                        Credit Rating:</td>
+                    <td>
+                        <asp:Label ID="CreditRatingLabel" runat="server" 
+                            Text='<%# Bind("CreditRating") %>' />
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <table style="width:100%; font-weight: bold; font-size: 11pt;">
+                <tr>
+                    <td class="TemplateSubHeader" 
+                        style="font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                        Learning Methods:</td>
+                    <td align="justify">
+                        <table style="width:100%;">
+                            <tr>
+                                <td align="justify">
+                                    <asp:Panel ID="LecturePanel" runat="server" 
+                                        Visible='<%# Eval("Lecture").ToString() == "0.0" ? false : true %>'>
+                                        <table style="width:100%;">
+                                            <tr>
+                                                <td class="LearningMethodsLayout">
+                                                    Lecture:</td>
+                                                <td>
+                                                    <asp:Label ID="LectureLabel" runat="server" Text='<%# Bind("Lecture","{0:#.##}") %>' />
+                                                    &nbsp;hours</td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                    <asp:Panel ID="SeminarPanel" runat="server" 
+                                        Visible='<%# Eval("Seminar").ToString() == "0.0" ? false : true %>'>
+                                        <table style="width:100%;">
+                                            <tr>
+                                                <td class="LearningMethodsLayout">
+                                                    Seminar:</td>
+                                                <td>
+                                                    <asp:Label ID="SeminarLabel" runat="server" Text='<%# Bind("Seminar","{0:#.##}") %>' />
+                                                    &nbsp;hours</td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                    <asp:Panel ID="TutorialPanel" runat="server" 
+                                        Visible='<%# Eval("TutorialAndProject").ToString() == "0.0" ? false : true %>'>
+                                        <table style="width:100%;">
+                                            <tr>
+                                                <td class="LearningMethodsLayout">
+                                                    Tutorial and Project:</td>
+                                                <td>
+                                                    <asp:Label ID="TutorialAndProjectLabel" runat="server" 
+                                                        Text='<%# Bind("TutorialAndProject","{0:#.##}") %>' />
+                                                    &nbsp;hours</td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                    <asp:Panel ID="PracticalPanel" runat="server" 
+                                        Visible='<%# Eval("PracticalAndDemonstrations").ToString() == "0.0" ? false : true %>'>
+                                        <table style="width:100%;">
+                                            <tr>
+                                                <td class="LearningMethodsLayout">
+                                                    Practical and Demonstrations:</td>
+                                                <td>
+                                                    <asp:Label ID="PracticalAndDemonstrationsLabel" runat="server" 
+                                                        Text='<%# Bind("PracticalAndDemonstrations","{0:#.##}") %>' />
+                                                    &nbsp;hours</td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                    <asp:Panel ID="StudioPanel" runat="server" 
+                                        Visible='<%# Eval("StudioAndWorkshop").ToString() == "0.0" ? false : true %>'>
+                                        <table style="width:100%;">
+                                            <tr>
+                                                <td class="LearningMethodsLayout">
+                                                    Studio and Workshop:</td>
+                                                <td>
+                                                    <asp:Label ID="StudioAndWorkshopLabel" runat="server" 
+                                                        Text='<%# Bind("StudioAndWorkshop","{0:#.##}") %>' />
+                                                    &nbsp;hours</td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                    <asp:Panel ID="FieldworkPanel" runat="server" 
+                                        Visible='<%# Eval("FieldworkAndExternal").ToString() == "0.0" ? false : true %>'>
+                                        <table style="width:100%;">
+                                            <tr>
+                                                <td class="LearningMethodsLayout">
+                                                    Fieldwork and External:</td>
+                                                <td>
+                                                    <asp:Label ID="FieldworkAndExternalLabel" runat="server" 
+                                                        Text='<%# Bind("FieldworkAndExternal","{0:#.##}") %>' />
+                                                    &nbsp;hours</td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                    <asp:Panel ID="WorkbasedPanel" runat="server" 
+                                        Visible='<%# Eval("WorkbasedLearning").ToString() == "0.0" ? false : true %>'>
+                                        <table style="width:100%;">
+                                            <tr>
+                                                <td class="LearningMethodsLayout">
+                                                    Workbased Learning:</td>
+                                                <td>
+                                                    <asp:Label ID="WorkbasedLearningLabel" runat="server" 
+                                                        Text='<%# Bind("WorkbasedLearning","{0:#.##}") %>' />
+                                                    &nbsp;hours</td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                    <asp:Panel ID="PlacementPanel" runat="server" 
+                                        Visible='<%# Eval("Placement").ToString() == "0.0" ? false : true %>'>
+                                        <table style="width:100%;">
+                                            <tr>
+                                                <td class="LearningMethodsLayout">
+                                                    Placement:&nbsp;</td>
+                                                <td>
+                                                    <asp:Label ID="PlacementLabel" runat="server" Text='<%# Bind("Placement","{0:#.##}") %>' />
+                                                    &nbsp;hours</td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                    <asp:Panel ID="StudyPanel" runat="server" 
+                                        Visible='<%# Eval("IndependentStudy").ToString() == "0.0" ? false : true %>'>
+                                        <table style="width:100%;">
+                                            <tr>
+                                                <td class="LearningMethodsLayout">
+                                                    Independent Study:&nbsp;</td>
+                                                <td>
+                                                    <asp:Label ID="IndependentStudyLabel" runat="server" 
+                                                        Text='<%# Bind("IndependentStudy","{0:#.##}") %>' />
+                                                    &nbsp;hours</td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                    <asp:Panel ID="TotalPanel" runat="server">
+                                        <table style="width: 100%;">
+                                            <tr>
+                                                <td class="LearningMethodsLayout">
+                                                    Total Hours:</td>
+                                                <td>
+                                                    <asp:Label ID="TotalHoursLabel" runat="server" 
+                                                        Text='<%# Bind("TotalHours", "{0:#.##}") %>' />
+                                                    &nbsp;hours</td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <asp:Panel ID="PrePanel" runat="server" 
+                Visible='<%#Eval("Pre_Requisites")!=DBNull.Value%>'>
+                <table style="width:100%; font-weight: bold; font-size: 11pt;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Recommended Prior Study:</td>
+                        <td>
+                            <asp:Label ID="R_P_SLabel" runat="server" Text='<%# Eval("R_P_S") %>' />
+                        </td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="RPSPanel" runat="server" 
+                Visible='<%#Eval("R_P_S")!=DBNull.Value%>'>
+                <table style="width:100%; font-weight: bold; font-size: 11pt;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Pre-Requisite/s</td>
+                        <td>
+                            <asp:Label ID="Pre_RequisitesLabel" runat="server" 
+                                Text='<%# Eval("Pre_Requisites") %>' />
+                        </td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="CoPanel" runat="server" 
+                Visible='<%#Eval("Co_Requisites")!=DBNull.Value%>'>
+                <table style="width:100%; font-weight: bold; font-size: 11pt;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Co-Requisite/s</td>
+                        <td>
+                            <asp:Label ID="Co_RequisitesLabel" runat="server" 
+                                Text='<%# Eval("Co_Requisites") %>' />
+                        </td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="SharedPanel" runat="server" 
+                Visible='<%#Eval("SharedTeaching")!=DBNull.Value%>'>
+                <table style="width:100%; font-weight: bold; font-size: 11pt;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Shared Teaching:</td>
+                        <td>
+                            <asp:Label ID="SharedTeachingLabel" runat="server" 
+                                Text='<%# Eval("SharedTeaching") %>' />
+                        </td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="PBRPanel" runat="server" 
+                Visible='<%#Eval("P_B_R")!=DBNull.Value%>'>
+                <table style="width:100%; font-weight: bold; font-size: 11pt;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Professional Body Requirement:</td>
+                        <td>
+                            <asp:Label ID="P_B_RLabel" runat="server" Text='<%# Eval("P_B_R") %>' />
+                        </td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="GradedPanel" runat="server" 
+                Visible='<%#Eval("Graded")!=DBNull.Value%>'>
+                <table style="width:100%; font-weight: bold; font-size: 11pt;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Graded or not Graded:</td>
+                        <td>
+                            <asp:Label ID="GradedLabel" runat="server" Text='<%# Eval("Graded") %>' />
+                        </td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="BarredPanel" runat="server" Visible='<%#Eval("BarredCombination")!=DBNull.Value%>'>
+                <table style="width:100%; font-weight: bold; font-size: 11pt;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Barred Combination:</td>
+                        <td>
+                            <asp:Label ID="BarredCombinationLabel" runat="server" 
+                                Text='<%# Eval("BarredCombination") %>' />
+                        </td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <br />
+            <asp:Panel ID="AimPanel" runat="server" Visible='<%#Eval("ModuleAims")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td style="font-size: 20px; text-align: center; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Module Aim:</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <asp:Label ID="ModuleAimsLabel" runat="server" 
+                                Text='<%# Eval("ModuleAims").ToString().Replace("\r\n", "<br />") %>' />
+                        </td>
+                    </tr>
+                </table>
+                <br />
+            </asp:Panel>
+            <asp:Panel ID="SynopsisPanel" runat="server">
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="text-align: center; font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Module Synopsis</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <asp:Label ID="SynopsisLabel" runat="server" 
+                                Text='<%# Eval("Synopsis").ToString().Replace("\r\n", "<br />") %>' />
+                        </td>
+                    </tr>
+                </table>
+                <br />
+            </asp:Panel>
+            <asp:Panel ID="SyllabusPanel" runat="server">
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="text-align: center; font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Module Syllabus</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <asp:Label ID="SyllabusLabel" runat="server" 
+                                Text='<%# Eval("Syllabus").ToString().Replace("\r\n", "<br />") %>' />
+                        </td>
+                    </tr>
+                </table>
+                <br />
+            </asp:Panel>
+            <table style="width:100%;">
+                <tr>
+                    <td style="font-size: 20px; text-align: center; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                        Learning Outcomes</td>
+                </tr>
+            </table>
+            <asp:Panel ID="OutcomesPanel" runat="server" Visible='<%#Eval("LearningOutcomes")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td>
+                            <asp:Label ID="LearningOutcomesLabel" runat="server" 
+                                
+                                Text='<%# Eval("LearningOutcomes").ToString().Replace("\r\n", "<br />") %>' />
+                        </td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <br />
+            <asp:Panel ID="KnowledgePanel" runat="server" 
+                Visible='<%#Eval("Knowledge")!=DBNull.Value%>'>
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="font-size: 17.5px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Knowledge &amp; Understanding:</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <asp:Label ID="KnowledgeLabel" runat="server" 
+                                Text='<%# Eval("Knowledge").ToString().Replace("\r\n", "<br />") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="AbilitiesPanel" runat="server" 
+                Visible='<%#Eval("Abilities")!=DBNull.Value%>'>
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="font-size: 17.5px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Abilities:</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <asp:Label ID="AbilitiesLabel" runat="server" 
+                                Text='<%# Eval("Abilities").ToString().Replace("\r\n", "<br />") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <table style="width: 100%;">
+                <tr>
+                    <td style="text-align: center; font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                        Assessment Strategy</td>
+                </tr>
+            </table>
+            <asp:Panel ID="AssessmentPanel" runat="server" 
+                Visible='<%#Eval("AssessmentStrategy")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td>
+                            <asp:Label ID="AssessmentStrategyLabel" runat="server" 
+                                
+                                Text='<%# Eval("AssessmentStrategy").ToString().Replace("\r\n", "<br />") %>' />
+                        </td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <br />
+            <asp:Panel ID="FormativePanel" runat="server" 
+                Visible='<%#Eval("Formative")!=DBNull.Value%>'>
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="font-size: 17.5px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Formative Assessment:
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <asp:Label ID="FormativeLabel" runat="server" 
+                                Text='<%# Eval("Formative").ToString().Replace("\r\n", "<br />") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="SummativePanel" runat="server" Visible='<%#Eval("Summative")!=DBNull.Value%>'>
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="font-size: 17.5px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Summative Assessment:
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <asp:Label ID="SummativeLabel" runat="server" 
+                                Text='<%# Eval("Summative").ToString().Replace("\r\n", "<br />") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="TasksPanel" runat="server" Visible='<%#Eval("Tasks")!=DBNull.Value%>'>
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="font-size: 17.5px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Assessment Tasks/Weightings:</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <asp:Label ID="TasksLabel" runat="server" 
+                                Text='<%# Eval("Tasks").ToString().Replace("\r\n", "<br />") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="TablePanel" runat="server" Visible="False">
+                <table style="width:100%;">
+                    <tr>
+                        <td style="font-size: 17.5px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Assessment Table:</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <asp:GridView ID="GridViewAssessmentTable" runat="server" 
+                                AutoGenerateColumns="False" DataKeyNames="SummativeID" 
+                                DataSourceID="SqlAssessmentTable" 
+                                Width="905px" EnableTheming="True">
+                                <Columns>
+                                    <asp:BoundField DataField="SummativeID" HeaderText="SummativeID" 
+                                        InsertVisible="False" ReadOnly="True" SortExpression="SummativeID" 
+                                        Visible="False" />
+                                    <asp:BoundField DataField="AssessmentType" HeaderText="Assessment Type" 
+                                        SortExpression="AssessmentType" />
+                                    <asp:BoundField DataField="LO" HeaderText="Learning Outcomes" 
+                                        SortExpression="LO" />
+                                    <asp:BoundField DataField="Summary" HeaderText="Summary" 
+                                        SortExpression="Summary" />
+                                    <asp:BoundField DataField="Component" HeaderText="Component" 
+                                        SortExpression="Component" />
+                                    <asp:TemplateField HeaderText="FE" SortExpression="FE">
+                                        <EditItemTemplate>
+                                            <asp:CheckBox ID="CheckBox1" runat="server" Checked='<%# Bind("FE") %>' />
+                                        </EditItemTemplate>
+                                        <ItemTemplate>
+                                            <asp:Label ID="Label26" runat="server" 
+                                                Text='<%# (Eval("FE").Equals(true) ? "Yes" : (Eval("FE").Equals(false) ? "No" : "" )) %>' />
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                    <asp:TemplateField HeaderText="TR" SortExpression="TR">
+                                        <EditItemTemplate>
+                                            <asp:CheckBox ID="CheckBox2" runat="server" Checked='<%# Bind("TR") %>' />
+                                        </EditItemTemplate>
+                                        <ItemTemplate>
+                                            <asp:Label ID="Label27" runat="server" 
+                                                Text='<%# (Eval("TR").Equals(true) ? "Yes" : (Eval("TR").Equals(false) ? "No" : "" )) %>' />
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                    <asp:TemplateField HeaderText="AM" SortExpression="AM">
+                                        <EditItemTemplate>
+                                            <asp:CheckBox ID="CheckBox3" runat="server" Checked='<%# Bind("AM") %>' />
+                                        </EditItemTemplate>
+                                        <ItemTemplate>
+                                            <asp:Label ID="Label28" runat="server" 
+                                                Text='<%# (Eval("AM").Equals(true) ? "Yes" : (Eval("AM").Equals(false) ? "No" : "" )) %>' />
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                    <asp:BoundField DataField="AssessmentID" HeaderText="AssessmentID" 
+                                        SortExpression="AssessmentID" Visible="False" />
+                                </Columns>
+                            </asp:GridView>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="style13">
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="CriteriaPanel" runat="server" 
+                Visible='<%#Eval("Criteria")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td style="font-size: 17.5px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Assessment Criteria:</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <asp:Label ID="CriteriaLabel" runat="server" 
+                                Text='<%# Eval("Criteria").ToString().Replace("\r\n", "<br />") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="StrategyPanel" runat="server" 
+                Visible='<%#Eval("Strategy")!=DBNull.Value%>'>
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="text-align: center; font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Learning Strategy</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <asp:Label ID="StrategyLabel" runat="server" 
+                                Text='<%# Eval("Strategy").ToString().Replace("\r\n", "<br />") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="ResourcesPanel" runat="server" 
+                Visible='<%#Eval("ResourcesRequired")!=DBNull.Value%>'>
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="text-align: center; font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Resources Required</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <asp:Label ID="ResourcesRequiredLabel" runat="server" 
+                                Text='<%# Eval("ResourcesRequired").ToString().Replace("\r\n", "<br />") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="ReadingPanel" runat="server">
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="text-align: center; font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Reading List</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <asp:HyperLink ID="ReadingListLabel" runat="server" 
+                                NavigateUrl='<%# Bind("ReadingList") %>' Target="_blank" 
+                                Text='<%# Bind("ReadingList") %>'></asp:HyperLink>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="OtherPanel" runat="server" Visible='<%#Eval("OtherInfo")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td style="font-size: 20px; text-align: center; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                            Other Information:</td>
+                    </tr>
+                    <tr>
+                        <td class=" ">
+                            <asp:Label ID="OtherInfoLabel" runat="server" 
+                                Text='<%# Eval("OtherInfo").ToString().Replace("\r\n", "<br />") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class=" ">
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <table style="width: 100%;">
+                <tr>
+                    <td style="text-align: center; font-size: 20px; font-family: Calibri; color: #FFFFFF; background-color: #006699;">
+                        Approved</td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:Label ID="ApprovedLabel" runat="server" 
+                            Text='<%# Eval("Approved").ToString().Replace("\r\n", "<br />") %>' />
+                    </td>
+                </tr>
+            </table>
+        </ItemTemplate>
+        <RowStyle ForeColor="Black" />
+    </asp:FormView>
+</asp:Content>

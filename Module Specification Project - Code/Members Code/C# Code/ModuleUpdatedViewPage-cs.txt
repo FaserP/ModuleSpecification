@@ -1,0 +1,1904 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Net.Mail;
+using System.Configuration;
+using System.Net;
+using System.Windows.Forms;
+using Microsoft.Office.Interop.Word;
+using System.IO;
+using System.Data.SqlClient;
+
+namespace ModuleSpecificationSite.Members
+{
+    public partial class ModuleUpdatedViewPage : System.Web.UI.Page
+    {
+        //These are used for exporting the spec information into the word application.
+        Microsoft.Office.Interop.Word.Application oWord;
+        Microsoft.Office.Interop.Word.Document oWordDoc;
+        Object oMissing = System.Reflection.Missing.Value;
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            //Checks if the session is null or not
+            if (Session["getApprovedCode"] == null)
+            {
+                //description: when the session gets timed out, the page is redirected to appropriate page.
+                Response.Redirect("~/Members/ModuleSearch.aspx", false);
+                HttpContext.Current.ApplicationInstance.CompleteRequest();
+                return;
+            }
+            else
+            {
+                //stores the session to the labels.
+                lblStoreModuleCode.Text = Convert.ToString(Session["getApprovedModuleID"]);
+                LabelCode.Text = Convert.ToString(Session["getApprovedCode"]);
+            }
+            //clear the cache to stop duplicates
+            Response.Cache.SetCacheability(HttpCacheability.NoCache);
+
+            System.Web.UI.WebControls.DropDownList chk = new System.Web.UI.WebControls.DropDownList();
+            chk = (System.Web.UI.WebControls.DropDownList)(FormViewModuleTemplate.FindControl("DropDownList1"));
+
+            System.Web.UI.WebControls.DropDownList chk2 = new System.Web.UI.WebControls.DropDownList();
+            chk2 = (System.Web.UI.WebControls.DropDownList)(FormViewModuleTemplate.FindControl("DropDownList2"));
+
+            System.Web.UI.WebControls.Button UpdateBut1 = new System.Web.UI.WebControls.Button();
+            UpdateBut1 = (System.Web.UI.WebControls.Button)(FormViewModuleTemplate.FindControl("UpdateButton"));
+
+            System.Web.UI.WebControls.Label test = new System.Web.UI.WebControls.Label();
+            test = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("Label32"));
+
+            System.Web.UI.WebControls.TextBox textbox1 = new System.Web.UI.WebControls.TextBox();
+            textbox1 = (System.Web.UI.WebControls.TextBox)(FormViewModuleTemplate.FindControl("TextBoxApproved"));
+            System.Web.UI.WebControls.Label label1 = new System.Web.UI.WebControls.Label();
+            label1 = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("ApprovedLabel"));
+
+            System.Web.UI.WebControls.Panel comments = new System.Web.UI.WebControls.Panel();
+            comments = (System.Web.UI.WebControls.Panel)(FormViewModuleTemplate.FindControl("Panel1"));
+
+            //check to see what the dropdownlist status is. If dropdownlist is 3 then makes the comment visable and
+            //enable the button
+            if (chk.SelectedValue == "3")
+            {
+                comments.Visible = true;
+                comments.Focus();
+                UpdateBut1.Enabled = true;
+                chk2.Visible = true;
+
+                if (test.Text == "4")
+                {
+                    textbox1.Visible = false;
+                    label1.Visible = true;
+                }
+                else
+                {
+                    textbox1.Visible = false;
+                    label1.Visible = true;
+                }
+            }
+            //If dropdownlist is 2 then makes the comment hidden and
+            //enable the button
+            else if (chk.SelectedValue == "2")
+            {
+                comments.Visible = false;
+                chk.Focus();
+                UpdateBut1.Enabled = true;
+                chk2.Visible = false;
+
+                if (test.Text == "4")
+                {
+                    textbox1.Visible = true;
+                    label1.Visible = false;
+                    textbox1.Focus();
+                }
+                else
+                {
+                    textbox1.Visible = false;
+                    label1.Visible = true;
+                }
+            }
+            //Makes the comment hidden and disable the button
+            else
+            {
+                UpdateBut1.Enabled = false;
+                comments.Visible = false;
+                chk2.Visible = false;
+
+                if (test.Text == "4")
+                {
+                    textbox1.Visible = false;
+                    label1.Visible = true;
+                }
+                else
+                {
+                    textbox1.Visible = false;
+                    label1.Visible = true;
+                }
+            }
+        }
+
+        protected void FormView1_ItemUpdated(object sender, FormViewUpdatedEventArgs e)
+        {
+            string code = ((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("ModuleCodeLabel")).Text.Replace("&nbsp;", " ");
+
+            System.Web.UI.WebControls.DropDownList chk = new System.Web.UI.WebControls.DropDownList();
+            chk = (System.Web.UI.WebControls.DropDownList)(FormViewModuleTemplate.FindControl("DropDownList1"));
+
+            System.Web.UI.WebControls.DropDownList chk2 = new System.Web.UI.WebControls.DropDownList();
+            chk2 = (System.Web.UI.WebControls.DropDownList)(FormViewModuleTemplate.FindControl("DropDownList2"));
+
+            System.Web.UI.WebControls.Label test = new System.Web.UI.WebControls.Label();
+            test = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("Label32"));
+
+            System.Web.UI.WebControls.TextBox textbox1 = new System.Web.UI.WebControls.TextBox();
+            textbox1 = (System.Web.UI.WebControls.TextBox)(FormViewModuleTemplate.FindControl("TextBoxComment"));
+
+            var role = System.Web.Security.Roles.GetRolesForUser().Single();
+
+            //if checkbox is selected as 2 then this means that the person is approving so what will happen:
+            if (chk.SelectedValue == "2")
+            {
+                //if the value is 4 then this is the final process of approving and an email will be sent to the module leader.
+                //the document will also be uploaded to the word file and sharepoint site.
+                if (test.Text == "4")
+                {
+                    //This is used to send an email to the next person which is Subject Leader.
+                    //For the moment this is linked to my email address.
+                    //Change this to the right person to be sent when you get to this step.
+                    ExportSpecInformation();
+                    oWordDoc.SaveAs(Server.MapPath(@"~\Documents\UpdatedWord\" + code + ".docx"));
+                    oWordDoc.ExportAsFixedFormat((Server.MapPath(@"~\Documents\PDFs\" + code + ".pdf")), WdExportFormat.wdExportFormatPDF);
+                    ((_Application)oWord).Quit();
+                    File.Delete(Server.MapPath(@"~\Documents\Word\" + code + ".docx"));
+                    File.Copy((Server.MapPath(@"~\Documents\UpdatedWord\" + code + ".docx")), (Server.MapPath(@"~\Documents\Word\" + code + ".docx")));
+                    String r = LabelCode.Text;
+                    System.Net.Mail.MailMessage mail = new System.Net.Mail.MailMessage();
+                    MailAddress from = new MailAddress("F.Parvez@hud.ac.uk");
+                    string to = ("F.Parvez@hud.ac.uk");
+                    SmtpClient clientobj = new SmtpClient("MIRAGE.AD.HUD.AC.UK");
+                    mail.From = from;
+                    mail.To.Add(new MailAddress(to));
+                    mail.Subject = "Module Specification Document approved";
+                    mail.IsBodyHtml = true;
+                    mail.Body += "Dear user,";
+                    mail.Body += "<br />";
+                    mail.Body += "<br />";
+                    mail.Body += "This is an email to inform you that your <br />";
+                    mail.Body += "Module Specification Document" + code + "has been approved.";
+                    clientobj.Send(mail);
+
+                    Response.Redirect("~/Members/ApprovedMessage.aspx");
+                }
+                else
+                //The approval will be sent to the next person by email and it will make an history of the process
+                //to the progress.
+                {
+                    //This is used to send an email to the next person which is Subject Leader.
+                    //For the moment this is linked to my email address.
+                    //Change this to the right person to be sent when you get to this step.
+                    System.Net.Mail.MailMessage mail = new System.Net.Mail.MailMessage();
+                    MailAddress from = new MailAddress("F.Parvez@hud.ac.uk");
+                    string to = ("F.Parvez@hud.ac.uk");
+                    SmtpClient clientobj = new SmtpClient("MIRAGE.AD.HUD.AC.UK");
+                    mail.From = from;
+                    mail.To.Add(new MailAddress(to));
+                    mail.Subject = "Module Document " + code + " waiting for approval";
+                    mail.IsBodyHtml = true;
+                    mail.Body += "Dear user,";
+                    mail.Body += "<br />";
+                    mail.Body += "<br />";
+                    mail.Body += "This is an email to inform you that the following module document" + code + "<br />";
+                    mail.Body += "is waiting to be approved. Please log into the site and look at the module.";
+                    clientobj.Send(mail);
+
+                    String r = LabelCode.Text;
+                    //Save the history of approving the module to the progress table.
+                    try
+                    {
+                        SqlDataSourceComments.InsertParameters["ModuleCode"].DefaultValue = r.ToString();
+                        SqlDataSourceComments.InsertParameters["ApprovalStatus"].DefaultValue = "Approved";
+                        SqlDataSourceComments.InsertParameters["UserNameFrom"].DefaultValue = User.Identity.Name.ToString();
+                        SqlDataSourceComments.InsertParameters["RoleFrom"].DefaultValue = role;
+                        SqlDataSourceComments.InsertParameters["EmailFrom"].DefaultValue = from.ToString();
+                        if (test.Text == "1")
+                        {
+                            SqlDataSourceComments.InsertParameters["UserNameTo"].DefaultValue = "Head of Department";
+                            SqlDataSourceComments.InsertParameters["RoleTo"].DefaultValue = "Head of Department";
+                        }
+                        else if (test.Text == "2")
+                        {
+                            SqlDataSourceComments.InsertParameters["UserNameTo"].DefaultValue = "SAVP Admin";
+                            SqlDataSourceComments.InsertParameters["RoleTo"].DefaultValue = "SAVP Admin";
+                        }
+                        else if (test.Text == "3")
+                        {
+                            SqlDataSourceComments.InsertParameters["UserNameTo"].DefaultValue = "Head of SAVP";
+                            SqlDataSourceComments.InsertParameters["RoleTo"].DefaultValue = "Head of SAVP";
+                        }
+                        SqlDataSourceComments.InsertParameters["EmailTo"].DefaultValue = to.ToString();
+                        SqlDataSourceComments.InsertParameters["Comments"].DefaultValue = string.Empty;
+
+
+                        SqlDataSourceComments.Insert();
+                        SqlDataSourceComments.DataBind();
+                    }
+                    catch (SqlException)
+                    {
+                        MessageBox.Show("Error: aborted inserting the progress for this module due to a problem");
+                    }
+                    Response.Redirect("~/Members/ApprovedMessage.aspx");
+
+                }
+            }
+            //If the check box is set to 3 then this means the user is rejecting the module so that the process
+            //gets sent back to the person they want to reject and send them an email
+            else if (chk.SelectedValue == "3")
+            {
+                //This is used to send an email to the next person which is Subject Leader.
+                //For the moment this is linked to my email address.
+                //Change this to the right person to be sent when you get to this step.
+                System.Net.Mail.MailMessage mail = new System.Net.Mail.MailMessage();
+                MailAddress from = new MailAddress("F.Parvez@hud.ac.uk");
+                string to = ("F.Parvez@hud.ac.uk");
+                SmtpClient clientobj = new SmtpClient("MIRAGE.AD.HUD.AC.UK");
+                mail.From = from;
+                mail.To.Add(new MailAddress(to));
+                mail.Subject = "Your Module Specification Document";
+                mail.IsBodyHtml = true;
+                mail.Body += "Dear user,";
+                mail.Body += "<br />";
+                mail.Body += "<br />";
+                mail.Body += "This is an email to inform you that your <br />";
+                mail.Body += "Module Specification Document" + code + "has been rejected.";
+                mail.Body += "<br />";
+                mail.Body += "<br />";
+                mail.Body += "Please log into the system to see feedback on why the document has been rejected.";
+                clientobj.Send(mail);
+                String r = LabelCode.Text;
+                //Save the history of approving the module to the progress table.
+                try
+                {
+                    SqlDataSourceComments.InsertParameters["ModuleCode"].DefaultValue = r.ToString();
+                    SqlDataSourceComments.InsertParameters["ApprovalStatus"].DefaultValue = "Rejected";
+                    SqlDataSourceComments.InsertParameters["UserNameFrom"].DefaultValue = User.Identity.Name.ToString();
+                    SqlDataSourceComments.InsertParameters["RoleFrom"].DefaultValue = role;
+                    SqlDataSourceComments.InsertParameters["EmailFrom"].DefaultValue = from.ToString();
+                    SqlDataSourceComments.InsertParameters["UserNameTo"].DefaultValue = chk2.SelectedItem.Text;
+                    SqlDataSourceComments.InsertParameters["RoleTo"].DefaultValue = chk2.SelectedItem.Text;
+                    SqlDataSourceComments.InsertParameters["EmailTo"].DefaultValue = to.ToString();
+                    SqlDataSourceComments.InsertParameters["Comments"].DefaultValue = textbox1.Text;
+
+
+                    SqlDataSourceComments.Insert();
+                    SqlDataSourceComments.DataBind();
+                }
+                catch (SqlException)
+                {
+                    MessageBox.Show("Error: aborted inserting the progress for this module due to a problem");
+                }
+                Response.Redirect("~/Members/ApprovedMessage.aspx");
+            }
+        }
+
+        //This is used to check if courses/tutors/locatin/assessment has anything selected.
+        #region "SqlDataSource CheckBoxStates"
+        protected void SqlDataSourceTempTutor_Selected(object sender, SqlDataSourceStatusEventArgs e)
+        {
+            System.Web.UI.WebControls.Panel paneltutor = new System.Web.UI.WebControls.Panel();
+            paneltutor = (System.Web.UI.WebControls.Panel)(FormViewModuleTemplate.FindControl("TutorPanel"));
+
+            System.Web.UI.WebControls.CheckBox chktutor = new System.Web.UI.WebControls.CheckBox();
+            chktutor = (System.Web.UI.WebControls.CheckBox)(FormViewModuleTemplate.FindControl("cbTutors"));
+
+            if (FormViewModuleTemplate.CurrentMode == FormViewMode.ReadOnly)
+            {
+                //if nothing selected then hides panel and untick checkbox
+                if (e.AffectedRows == 0)
+                {
+                    chktutor.Checked = false;
+                    paneltutor.Visible = false;
+                }
+                //if makes panel and check both true
+                else if (e.AffectedRows > 0)
+                {
+                    chktutor.Checked = true;
+                    paneltutor.Visible = true;
+                }
+            }
+        }
+
+        protected void SqlDataSourceTempLocation_Selected(object sender, SqlDataSourceStatusEventArgs e)
+        {
+            System.Web.UI.WebControls.Panel panellocation = new System.Web.UI.WebControls.Panel();
+            panellocation = (System.Web.UI.WebControls.Panel)(FormViewModuleTemplate.FindControl("LocationPanel"));
+
+            System.Web.UI.WebControls.CheckBox chklocation = new System.Web.UI.WebControls.CheckBox();
+            chklocation = (System.Web.UI.WebControls.CheckBox)(FormViewModuleTemplate.FindControl("cbLocation"));
+
+            //check if formview is readonly first
+            if (FormViewModuleTemplate.CurrentMode == FormViewMode.ReadOnly)
+            {
+                //if nothing selected then hides panel and untick checkbox
+                if (e.AffectedRows == 0)
+                {
+                    chklocation.Checked = false;
+                    panellocation.Visible = false;
+                }
+                //if makes panel and check both true
+                else if (e.AffectedRows > 0)
+                {
+                    chklocation.Checked = true;
+                    panellocation.Visible = true;
+                }
+            }
+        }
+
+        protected void SqlDataSourceTempCourse_Selected(object sender, SqlDataSourceStatusEventArgs e)
+        {
+            System.Web.UI.WebControls.Panel panelcourse = new System.Web.UI.WebControls.Panel();
+            panelcourse = (System.Web.UI.WebControls.Panel)(FormViewModuleTemplate.FindControl("CoursePanel"));
+
+            System.Web.UI.WebControls.CheckBox chkcourse = new System.Web.UI.WebControls.CheckBox();
+            chkcourse = (System.Web.UI.WebControls.CheckBox)(FormViewModuleTemplate.FindControl("cbCourses"));
+            //check if formview is readonly first
+            if (FormViewModuleTemplate.CurrentMode == FormViewMode.ReadOnly)
+            {
+                //if nothing selected then hides panel and untick checkbox
+                if (e.AffectedRows == 0)
+                {
+                    chkcourse.Checked = false;
+                    panelcourse.Visible = false;
+                }
+                //if makes panel and check both true
+                else if (e.AffectedRows > 0)
+                {
+                    chkcourse.Checked = true;
+                    panelcourse.Visible = true;
+                }
+            }
+        }
+
+        protected void SqlDataSourceTempTable_Selected(object sender, SqlDataSourceStatusEventArgs e)
+        {
+            System.Web.UI.WebControls.Panel paneltable = new System.Web.UI.WebControls.Panel();
+            paneltable = (System.Web.UI.WebControls.Panel)(FormViewModuleTemplate.FindControl("TablePanel"));
+
+            //check if formview is readonly first
+            if (FormViewModuleTemplate.CurrentMode == FormViewMode.ReadOnly)
+            {
+                //if nothing selected then hides panel and untick checkbox
+                if (e.AffectedRows == 0)
+                {
+                    paneltable.Visible = false;
+                }
+                //if makes panel and check both true
+                else if (e.AffectedRows > 0)
+                {
+                    paneltable.Visible = true;
+                }
+            }
+        }
+        #endregion
+
+        public void ExportSpecInformation()
+        {
+            oWord = new Microsoft.Office.Interop.Word.Application();
+            oWordDoc = new Microsoft.Office.Interop.Word.Document();
+
+            Object oTrue = false;
+            Object oFalse = false;
+            oWord.Visible = false;
+
+            Object oTemplatePath = (Server.MapPath(@"~\Documents\ModuleTemplate.dotx"));
+
+            oWordDoc = oWord.Documents.Add(ref oTemplatePath, ref oMissing, ref oMissing, ref oMissing);
+            foreach (Microsoft.Office.Interop.Word.Field myMergeField in oWordDoc.Fields)
+            {
+
+                Microsoft.Office.Interop.Word.Range rngFieldCode = myMergeField.Code;
+                String fieldText = rngFieldCode.Text;
+
+                if (fieldText.StartsWith(""))
+                {
+
+                    Int32 endMerge = fieldText.IndexOf("\\");
+                    Int32 fieldNameLength = fieldText.Length - endMerge;
+                    String fieldName = fieldText.Substring(11, endMerge - 11);
+
+                    fieldName = fieldName.Trim();
+
+                    Microsoft.Office.Interop.Word.Find fnd = oWord.ActiveWindow.Selection.Find;
+                    fnd.ClearFormatting();
+                    fnd.Replacement.ClearFormatting();
+                    fnd.Forward = true;
+                    fnd.Wrap = Microsoft.Office.Interop.Word.WdFindWrap.wdFindContinue;
+
+                    #region "Find Module Code"
+                    if (fieldName == "Code")
+                    {
+                        myMergeField.Select();
+                        oWord.Selection.TypeBackspace();
+                        oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("ModuleCodeLabel")).Text.Replace("&nbsp;", " "));
+                    }
+                    #endregion
+
+                    #region "Find Module Title"
+                    if (fieldName == "Title")
+                    {
+                        myMergeField.Select();
+                        oWord.Selection.TypeBackspace();
+                        oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("ModuleTitleLabel")).Text.Replace("&nbsp;", " "));
+                    }
+                    #endregion
+
+                    #region "Find School"
+                    if (fieldName == "School")
+                    {
+                        myMergeField.Select();
+                        oWord.Selection.TypeBackspace();
+                        oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("SchoolNameLabel")).Text.Replace("&nbsp;", " "));
+                    }
+                    #endregion
+
+                    #region "Find Courses"
+                    if (fieldName == "Courses")
+                    {
+                        System.Web.UI.WebControls.GridView GridViewTable = new System.Web.UI.WebControls.GridView();
+                        GridViewTable = (System.Web.UI.WebControls.GridView)(FormViewModuleTemplate.FindControl("GridViewCourseDetails"));
+
+                        System.Web.UI.WebControls.CheckBox chkcourse = FormViewModuleTemplate.FindControl("cbCourses") as System.Web.UI.WebControls.CheckBox;
+
+                        if (chkcourse.Checked)
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+
+                            for (int i = 0; i <= GridViewTable.Rows.Count - 1; i++)
+                            {
+                                for (int j = 0; j <= GridViewTable.Rows[i].Cells.Count - 1; j++)
+                                {
+                                    oWord.Selection.TypeText(GridViewTable.Rows[i].Cells[j].Text.Replace("&nbsp;", Environment.NewLine).Replace("&amp;", "&"));
+                                }
+                            }
+                            oWord.Selection.TypeBackspace();
+                        }
+                        else
+                        {
+                            fnd.Text = "NAME OF COURSE(S):";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Find Tutor"
+                    if (fieldName == "Tutor")
+                    {
+                        System.Web.UI.WebControls.GridView GridViewTable = new System.Web.UI.WebControls.GridView();
+                        GridViewTable = (System.Web.UI.WebControls.GridView)(FormViewModuleTemplate.FindControl("GridViewTutorDetails"));
+
+                        System.Web.UI.WebControls.CheckBox chktutor = FormViewModuleTemplate.FindControl("cbTutors") as System.Web.UI.WebControls.CheckBox;
+
+                        if (chktutor.Checked)
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            for (int i = 0; i <= GridViewTable.Rows.Count - 1; i++)
+                            {
+                                for (int j = 0; j <= GridViewTable.Rows[i].Cells.Count - 1; j++)
+                                {
+                                    oWord.Selection.TypeText(GridViewTable.Rows[i].Cells[j].Text.Replace("&nbsp;", ""));
+                                }
+                            }
+                            oWord.Selection.TypeBackspace();
+
+                        }
+                        else
+                        {
+                            fnd.Text = "MODULE LEADER:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Find Location"
+                    if (fieldName == "Location")
+                    {
+                        System.Web.UI.WebControls.GridView GridViewTable = new System.Web.UI.WebControls.GridView();
+                        GridViewTable = (System.Web.UI.WebControls.GridView)(FormViewModuleTemplate.FindControl("GridViewLocationDetails"));
+
+                        System.Web.UI.WebControls.CheckBox chklocation = FormViewModuleTemplate.FindControl("cbLocation") as System.Web.UI.WebControls.CheckBox;
+
+                        if (chklocation.Checked)
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            for (int i = 0; i <= GridViewTable.Rows.Count - 1; i++)
+                            {
+                                for (int j = 0; j <= GridViewTable.Rows[i].Cells.Count - 1; j++)
+                                {
+                                    oWord.Selection.TypeText(GridViewTable.Rows[i].Cells[j].Text.Replace("&nbsp;", Environment.NewLine));
+                                }
+                            }
+                            //oWord.Selection.TypeBackspace();
+                        }
+                        else
+                        {
+                            fnd.Text = "LOCATION:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            //oWord.Selection.TypeBackspace();
+                            //oWord.Selection.TypeBackspace();
+                            //oWord.Selection.TypeBackspace();
+                            //oWord.Selection.TypeBackspace();
+                            //oWord.Selection.TypeBackspace();
+                            //oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Find Compulsory"
+                    if (fieldName == "Compulsory")
+                    {
+                        System.Web.UI.WebControls.Label chkcompulsory = new System.Web.UI.WebControls.Label();
+                        chkcompulsory = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("CompulsoryLabel"));
+
+                        if (chkcompulsory.Text.Trim() != "")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(chkcompulsory.Text.Trim().Replace("&nbsp;", " "));
+                        }
+
+                        else
+                        {
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                        }
+                    }
+                    #endregion
+
+                    #region "Find Core"
+                    if (fieldName == "Core")
+                    {
+                        System.Web.UI.WebControls.Label chkcore = new System.Web.UI.WebControls.Label();
+                        chkcore = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("CoreLabel"));
+
+
+                        if (chkcore.Text.Trim() != "")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(chkcore.Text.Replace("&nbsp;", " "));
+                        }
+
+                        else
+                        {
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                        }
+                    }
+                    #endregion
+
+                    #region "Find Optional"
+                    if (fieldName == "Optional")
+                    {
+                        System.Web.UI.WebControls.Label chkoptional = new System.Web.UI.WebControls.Label();
+                        chkoptional = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("OptionalLabel"));
+
+                        if (chkoptional.Text.Trim() != "")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(chkoptional.Text.Replace("&nbsp;", " "));
+                        }
+
+                        else
+                        {
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                        }
+                    }
+                    #endregion
+
+                    #region "Find Stand Alone"
+                    if (fieldName == "Stand")
+                    {
+                        System.Web.UI.WebControls.Label chkstand = new System.Web.UI.WebControls.Label();
+                        chkstand = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("StandAloneLabel"));
+
+                        if (chkstand.Text.Trim() != "")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(chkstand.Text.Replace("&nbsp;", " "));
+                        }
+
+                        else
+                        {
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                        }
+                    }
+                    #endregion
+
+                    #region "Find Credit Rating"
+                    if (fieldName == "Credit")
+                    {
+                        myMergeField.Select();
+                        oWord.Selection.TypeBackspace();
+                        oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("CreditRatingLabel")).Text.Replace("&nbsp;", " "));
+                    }
+                    #endregion
+
+                    #region "Find Module Level"
+                    if (fieldName == "Level")
+                    {
+                        myMergeField.Select();
+                        oWord.Selection.TypeBackspace();
+                        oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("ModuleRatingLabel")).Text.Replace("&nbsp;", " "));
+                    }
+                    #endregion
+
+                    #region "Find Learning Methods"
+                    #region "Learning Method One"
+                    if (fieldName == "1")
+                    {
+                        System.Web.UI.WebControls.Label chk1 = new System.Web.UI.WebControls.Label();
+                        chk1 = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("LectureLabel"));
+
+                        if (chk1.Text != "0.0")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("LectureLabel")).Text.Replace("&nbsp;", " ").Replace(".0", "") + " hours");
+                        }
+
+                        else
+                        {
+                            fnd.Text = "Lecture:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Learning Method Two"
+                    if (fieldName == "2")
+                    {
+                        System.Web.UI.WebControls.Label chk2 = new System.Web.UI.WebControls.Label();
+                        chk2 = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("SeminarLabel"));
+
+                        if (chk2.Text != "0.0")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("SeminarLabel")).Text.Replace("&nbsp;", " ").Replace(".0", "") + " hours");
+                        }
+
+                        else
+                        {
+                            fnd.Text = "Seminar:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Learning Method Three"
+                    if (fieldName == "3")
+                    {
+                        System.Web.UI.WebControls.Label chk3 = new System.Web.UI.WebControls.Label();
+                        chk3 = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("TutorialAndProjectLabel"));
+
+                        if (chk3.Text != "0.0")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("TutorialAndProjectLabel")).Text.Replace("&nbsp;", " ").Replace(".0", "") + " hours");
+                        }
+
+                        else
+                        {
+                            fnd.Text = "Tutorial and Project Supervision:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Learning Method Four"
+                    if (fieldName == "4")
+                    {
+                        System.Web.UI.WebControls.Label chk4 = new System.Web.UI.WebControls.Label();
+                        chk4 = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("PracticalAndDemonstrationsLabel"));
+
+                        if (chk4.Text != "0.0")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("PracticalAndDemonstrationsLabel")).Text.Replace("&nbsp;", " ").Replace(".0", "") + " hours");
+                        }
+
+                        else
+                        {
+                            fnd.Text = "Practical Classes and Demonstrations:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Learning Method Five"
+                    if (fieldName == "5")
+                    {
+                        System.Web.UI.WebControls.Label chk5 = new System.Web.UI.WebControls.Label();
+                        chk5 = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("StudioAndWorkshopLabel"));
+
+                        if (chk5.Text != "0.0")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("StudioAndWorkshopLabel")).Text.Replace("&nbsp;", " ").Replace(".0", "") + " hours");
+                        }
+
+                        else
+                        {
+                            fnd.Text = "Supervised Time in Studio/Workshop:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Learning Method Six"
+                    if (fieldName == "6")
+                    {
+                        System.Web.UI.WebControls.Label chk6 = new System.Web.UI.WebControls.Label();
+                        chk6 = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("FieldworkAndExternalLabel"));
+
+                        if (chk6.Text != "0.0")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("FieldworkAndExternalLabel")).Text.Replace("&nbsp;", " ").Replace(".0", "") + " hours");
+                        }
+
+                        else
+                        {
+                            fnd.Text = "Fieldwork and External Visits:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Learning Method Seven"
+                    if (fieldName == "7")
+                    {
+                        System.Web.UI.WebControls.Label chk7 = new System.Web.UI.WebControls.Label();
+                        chk7 = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("WorkbasedLearningLabel"));
+
+                        if (chk7.Text != "0.0")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("WorkbasedLearningLabel")).Text.Replace("&nbsp;", " ").Replace(".0", "") + " hours");
+                        }
+
+                        else
+                        {
+                            fnd.Text = "Work Based Learning:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Learning Method Eight"
+                    if (fieldName == "8")
+                    {
+                        System.Web.UI.WebControls.Label chk8 = new System.Web.UI.WebControls.Label();
+                        chk8 = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("PlacementLabel"));
+
+                        if (chk8.Text != "0.0")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("PlacementLabel")).Text.Replace("&nbsp;", " ").Replace(".0", "") + " hours");
+                        }
+
+                        else
+                        {
+                            fnd.Text = "Placement and Year abroad:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Learning Method Nine"
+                    if (fieldName == "9")
+                    {
+                        System.Web.UI.WebControls.Label chk9 = new System.Web.UI.WebControls.Label();
+                        chk9 = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("IndependentStudyLabel"));
+
+                        if (chk9.Text != "0.0")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("IndependentStudyLabel")).Text.Replace("&nbsp;", " ").Replace(".0", "") + " hours");
+                        }
+
+                        else
+                        {
+                            fnd.Text = "Guided Independent study:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Learning Method Ten"
+                    if (fieldName == "10")
+                    {
+                        System.Web.UI.WebControls.Label chk10 = new System.Web.UI.WebControls.Label();
+                        chk10 = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("TotalHoursLabel"));
+
+                        if (chk10.Text != "0.0")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("TotalHoursLabel")).Text.Replace("&nbsp;", " ").Replace(".0", "") + " hours");
+                        }
+
+                        else
+                        {
+                            fnd.Text = "Total Hours:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+                    #endregion
+
+                    #region "Find Pre-Requisities"
+                    if (fieldName == "Pre")
+                    {
+                        myMergeField.Select();
+                        oWord.Selection.TypeBackspace();
+                        oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("Pre_RequisitesLabel")).Text.Replace("&nbsp;", " "));
+                    }
+                    #endregion
+
+                    #region "Find Recommended Prior Study"
+                    if (fieldName == "RPS")
+                    {
+                        myMergeField.Select();
+                        oWord.Selection.TypeBackspace();
+                        oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("R_P_SLabel")).Text.Replace("&nbsp;", " "));
+                    }
+                    #endregion
+
+                    #region "Find Co-Requisities"
+                    if (fieldName == "Co")
+                    {
+                        myMergeField.Select();
+                        oWord.Selection.TypeBackspace();
+                        oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("Co_RequisitesLabel")).Text.Replace("&nbsp;", " "));
+                    }
+                    #endregion
+
+                    #region "Find Shared Teaching"
+                    if (fieldName == "Shared")
+                    {
+                        myMergeField.Select();
+                        oWord.Selection.TypeBackspace();
+                        oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("SharedTeachingLabel")).Text.Replace("&nbsp;", " "));
+                    }
+                    #endregion
+
+                    #region "Find Professional Body Requirement"
+                    if (fieldName == "PBR")
+                    {
+                        myMergeField.Select();
+                        oWord.Selection.TypeBackspace();
+                        oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("P_B_RLabel")).Text.Replace("&nbsp;", " "));
+                    }
+                    #endregion
+
+                    #region "Find Graded or Not Graded"
+                    if (fieldName == "Grade")
+                    {
+                        myMergeField.Select();
+                        oWord.Selection.TypeBackspace();
+                        oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("GradedLabel")).Text.Replace("&nbsp;", " "));
+                    }
+                    #endregion
+
+                    #region Find Barred Combinations"
+                    if (fieldName == "Barred")
+                    {
+                        myMergeField.Select();
+                        oWord.Selection.TypeBackspace();
+                        oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("BarredCombinationLabel")).Text.Replace("&nbsp;", " "));
+                    }
+                    #endregion
+
+                    #region "Find Synopsis"
+                    if (fieldName == "Synopsis")
+                    {
+                        myMergeField.Select();
+                        oWord.Selection.TypeBackspace();
+                        oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("SynopsisLabel")).Text.Replace("&nbsp;", " ").Replace("<br />", "\r\n"));
+                    }
+                    #endregion
+
+                    #region "Find Syllabus"
+                    if (fieldName == "Syllabus")
+                    {
+                        myMergeField.Select();
+                        oWord.Selection.TypeBackspace();
+                        oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("SyllabusLabel")).Text.Replace("&nbsp;", " ").Replace("<br />", "\r\n"));
+                    }
+                    #endregion
+
+                    #region "Find Learning Outcomes"
+                    if (fieldName == "Outcomes")
+                    {
+                        System.Web.UI.WebControls.Label chkoutcomes = new System.Web.UI.WebControls.Label();
+                        chkoutcomes = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("LearningOutcomesLabel"));
+
+                        if (chkoutcomes.Text.Trim() != "")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("LearningOutcomesLabel")).Text.Replace("&nbsp;", " ").Replace("<br />", "\r\n"));
+                        }
+
+                        else
+                        {
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Find Knowledge"
+                    if (fieldName == "Knowledge")
+                    {
+                        System.Web.UI.WebControls.Label chkknowledge = new System.Web.UI.WebControls.Label();
+                        chkknowledge = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("KnowledgeLabel"));
+
+                        if (chkknowledge.Text.Trim() != "")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("KnowledgeLabel")).Text.Replace("&nbsp;", " ").Replace("<br />", "\r\n"));
+
+                            //SearchFind();
+                        }
+                        else
+                        {
+                            fnd.Text = "Knowledge and Understanding:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Find Abilities"
+                    if (fieldName == "Abilities")
+                    {
+                        System.Web.UI.WebControls.Label chkabilities = new System.Web.UI.WebControls.Label();
+                        chkabilities = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("AbilitiesLabel"));
+
+                        if (chkabilities.Text.Trim() != "")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("AbilitiesLabel")).Text.Replace("&nbsp;", " ").Replace("<br />", "\r\n"));
+                            //SearchFind();
+                        }
+
+                        else
+                        {
+                            fnd.Text = "Abilities:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Find Assessment"
+                    if (fieldName == "Assessment")
+                    {
+                        System.Web.UI.WebControls.Label chkassessment = new System.Web.UI.WebControls.Label();
+                        chkassessment = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("AssessmentStrategyLabel"));
+
+                        if (chkassessment.Text.Trim() != "")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("AssessmentStrategyLabel")).Text.Replace("&nbsp;", " ").Replace("<br />", "\r\n"));
+                        }
+
+                        else
+                        {
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Find Formative"
+                    if (fieldName == "Formative")
+                    {
+                        System.Web.UI.WebControls.Label chkformative = new System.Web.UI.WebControls.Label();
+                        chkformative = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("FormativeLabel"));
+
+                        if (chkformative.Text.Trim() != "")
+                        {
+                            myMergeField.Select();
+                            //oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("FormativeLabel")).Text.Replace("&nbsp;", " ").Replace("<br />", "\r\n"));
+                        }
+
+                        else
+                        {
+                            fnd.Text = "Formative Assessment:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Find Summative"
+                    if (fieldName == "Summative")
+                    {
+                        System.Web.UI.WebControls.Label chksummative = new System.Web.UI.WebControls.Label();
+                        chksummative = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("SummativeLabel"));
+
+                        if (chksummative.Text.Trim() != "")
+                        {
+                            myMergeField.Select();
+                            //oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("SummativeLabel")).Text.Replace("&nbsp;", " ").Replace("<br />", "\r\n"));
+                        }
+
+                        else
+                        {
+                            fnd.Text = "Summative Assessment:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 2;
+                            Object count = 2;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Find Tasks/Weighting"
+                    if (fieldName == "Tasks")
+                    {
+                        System.Web.UI.WebControls.Label chktasks = new System.Web.UI.WebControls.Label();
+                        chktasks = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("TasksLabel"));
+
+                        if (chktasks.Text.Trim() != "")
+                        {
+                            myMergeField.Select();
+                            //oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("TasksLabel")).Text.Replace("&nbsp;", " ").Replace("<br />", "\r\n"));
+                        }
+
+                        else
+                        {
+                            fnd.Text = "Assessment tasks/weighting:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Find Criteria"
+                    if (fieldName == "Criteria")
+                    {
+                        System.Web.UI.WebControls.Label chkcriteria = new System.Web.UI.WebControls.Label();
+                        chkcriteria = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("CriteriaLabel"));
+
+                        if (chkcriteria.Text.Trim() != "")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("CriteriaLabel")).Text.Replace("&nbsp;", " ").Replace("<br />", "\r\n"));
+                        }
+
+                        else
+                        {
+                            fnd.Text = "Assessment Criteria:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Find Learning Strategy"
+                    if (fieldName == "Strategy")
+                    {
+                        System.Web.UI.WebControls.Label chkstrategy = new System.Web.UI.WebControls.Label();
+                        chkstrategy = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("StrategyLabel"));
+
+                        if (chkstrategy.Text.Trim() != "")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("StrategyLabel")).Text.Replace("&nbsp;", " ").Replace("<br />", "\r\n"));
+                        }
+
+                        else
+                        {
+                            fnd.Text = "LEARNING STRATEGY:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Find Resources Required"
+                    if (fieldName == "Resources")
+                    {
+                        System.Web.UI.WebControls.Label chkresources = new System.Web.UI.WebControls.Label();
+                        chkresources = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("ResourcesRequiredLabel"));
+
+                        if (chkresources.Text != "")
+                        {
+                            //myMergeField.Select();
+                            //oWord.Selection.TypeBackspace();
+                            //oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("ResourcesRequiredLabel")).Text.Replace("&nbsp;", " ").Replace("<br />", "\r\n"));
+                            fnd.Text = "RESOURCES REQUIRED:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+
+                        else
+                        {
+                            fnd.Text = "RESOURCES REQUIRED:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Other Infomation"
+                    #region "Scheme"
+                    if (fieldName == "Scheme")
+                    {
+                        System.Web.UI.WebControls.Label test = new System.Web.UI.WebControls.Label();
+                        test = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("ModuleSchemeLabel"));
+
+                        if (test.Text.Trim() != "")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("ModuleSchemeLabel")).Text.Replace("&nbsp;", " "));
+                        }
+
+                        else
+                        {
+                            fnd.Text = "MODULE SCHEME:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "Status"
+                    if (fieldName == "Status")
+                    {
+                        System.Web.UI.WebControls.Label chkstatus = new System.Web.UI.WebControls.Label();
+                        chkstatus = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("ModuleStatusLabel"));
+
+                        if (chkstatus.Text.Trim() != "")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("ModuleStatusLabel")).Text.Replace("&nbsp;", " "));
+                        }
+
+                        else
+                        {
+                            fnd.Text = "MODULE STATUS:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeBackspace();
+
+                        }
+                    }
+                    #endregion
+
+                    #region "Aim"
+                    if (fieldName == "Aim")
+                    {
+                        System.Web.UI.WebControls.Label chkscheme = new System.Web.UI.WebControls.Label();
+                        chkscheme = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("ModuleAimsLabel"));
+
+                        if (chkscheme.Text.Trim() != "")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("ModuleAimsLabel")).Text.Replace("&nbsp;", " "));
+                        }
+
+                        else
+                        {
+                            fnd.Text = "MODULE AIM:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 2;
+                            Object count = 2;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+
+                    #region "OtherInfo"
+                    if (fieldName == "Other")
+                    {
+                        System.Web.UI.WebControls.Label chkother = new System.Web.UI.WebControls.Label();
+                        chkother = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("OtherInfoLabel"));
+
+                        if (chkother.Text.Trim() != "")
+                        {
+                            myMergeField.Select();
+                            oWord.Selection.TypeBackspace();
+                            oWord.Selection.TypeText(((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("OtherInfoLabel")).Text.Replace("&nbsp;", " "));
+                        }
+
+                        else
+                        {
+                            fnd.Text = "OTHER INFORMATION:";
+                            fnd.Replacement.Text = "";
+
+                            object replaceAll = Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll;
+                            fnd.Execute(ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+                                ref replaceAll, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+                            myMergeField.Select();
+                            myMergeField.Delete();
+                            //
+
+                            oWord.Selection.TypeBackspace();
+                            Range range = oWord.Selection.Range;
+                            Object unit = 1;
+                            Object count = 1;
+                            range.Delete(ref unit, ref count);
+                        }
+                    }
+                    #endregion
+                    #endregion
+                }
+            }
+            #region "Find Table"
+            //if (oWordDoc.Bookmarks.Exists("tabledata"))
+            //{
+            //    System.Web.UI.WebControls.GridView GridViewTable = new System.Web.UI.WebControls.GridView();
+            //    GridViewTable = (System.Web.UI.WebControls.GridView)(FormViewModuleTemplate.FindControl("GridViewAssessmentTable"));
+
+            //    if (GridViewTable.Rows.Count == 0)
+            //    {
+            //        oWordDoc.Bookmarks["tabledata"].Range.Text = "";
+
+            //        Range range = oWord.Selection.Range;
+            //        Object unit = 1;
+            //        Object count = 1;
+            //        range.Delete(ref unit, ref count);
+            //    }
+            //    else
+            //    {
+            //        GridViewTable.Width = 625;
+            //        string code = LabelCode.Text;
+            //        string test = Server.MapPath(@"~\Documents\Word\" + code + ".html");
+            //        StreamWriter sWriter = System.IO.File.CreateText(test);
+            //        System.IO.StringWriter sw = new System.IO.StringWriter();
+            //        System.Web.UI.HtmlTextWriter hw = new HtmlTextWriter(sw);
+            //        GridViewTable.HeaderRow.Cells[0].Visible = false;
+            //        for (int i = 0; i < GridViewTable.Rows.Count; i++)
+            //        {
+            //            GridViewRow row = GridViewTable.Rows[i];
+            //            //row.Cells[0].Visible = false;
+            //        }
+            //        GridViewTable.RenderControl(hw);
+            //        sWriter.WriteLine(sw.ToString());
+            //        sWriter.Close();
+
+            //        String oFilePath = Server.MapPath(@"~\Documents\Word\" + code + ".html");
+            //        oWordDoc.Bookmarks["tabledata"].Range.InsertFile(oFilePath, ref oMissing, ref oFalse, ref oFalse, ref oFalse);
+            //        System.IO.File.Delete(Server.MapPath(@"~\Documents\Word\" + code + ".html"));
+            //        for (int i = 0; i < GridViewTable.Rows.Count; i++)
+            //        {
+            //            GridViewRow row = GridViewTable.Rows[i];
+            //            GridViewTable.Width = 885;
+            //            GridViewTable.DataBind();
+            //            //row.Cells[0].Visible = true;
+            //            //GridViewTable.HeaderRow.Cells[0].Visible = true;
+            //        }
+            //    }
+            //}
+            #endregion
+
+            #region "Find Approved"
+            string approved = ((System.Web.UI.WebControls.TextBox)FormViewModuleTemplate.FindControl("TextBoxApproved")).Text.Replace("&nbsp;", " ").Replace("<br />", "\r\n");
+            if (oWordDoc.Bookmarks.Exists("approved"))
+            {
+                oWordDoc.Bookmarks["approved"].Range.Text = approved;
+            }
+            #endregion
+
+            #region "Find Reading List"
+            if (oWordDoc.Bookmarks.Exists("readinglist"))
+            {
+                Object oAddress = ((System.Web.UI.WebControls.HyperLink)FormViewModuleTemplate.FindControl("ReadingListLabel")).Text.Replace("&nbsp;", " ").Replace("<br />", "\r\n");
+                Object oRange = oWordDoc.Bookmarks["readinglist"].Range;
+                oWordDoc.Hyperlinks.Add(oRange, ref oAddress, ref oMissing, ref oMissing, ref oMissing, ref oMissing).Range.Font.Size = 14;
+            }
+            #endregion
+        }
+
+        protected void btnExportToWord_Click(object sender, ImageClickEventArgs e)
+        {
+            try
+            {
+                string code = ((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("ModuleCodeLabel")).Text.Replace("&nbsp;", " ");
+                string path = (Server.MapPath(@"~\Documents\Word\" + code + ".docx"));
+
+                System.IO.FileInfo file = new System.IO.FileInfo(path);
+                if (file.Exists)
+                {
+                    Response.Clear();
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + file.Name);
+                    Response.AddHeader("Content-Length", file.Length.ToString());
+                    Response.ContentType = "application/octet-stream";
+                    Response.WriteFile(file.FullName);
+                    Response.End();
+                }
+                else
+                {
+                    MessageBox.Show("This file does not exist", "Error");
+                }
+            }
+            catch (NullReferenceException)
+            {
+                MessageBox.Show("This file does not exist", "Error");
+            }
+        }
+
+        protected void btnExportToWord0_Click(object sender, ImageClickEventArgs e)
+        {
+            string code = ((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("ModuleCodeLabel")).Text.Replace("&nbsp;", " ");
+            Microsoft.Office.Interop.Word.Application wordApp = new Microsoft.Office.Interop.Word.Application();
+            wordApp.Visible = false;
+            wordApp.DisplayAlerts = WdAlertLevel.wdAlertsNone;
+            object wordTrue = (object)true;
+            object wordFalse = (object)false;
+            object fileToOpen = (Server.MapPath(@"~\Documents\Word\" + code + ".docx"));
+            object missing = Type.Missing;
+            Microsoft.Office.Interop.Word.Document doc1 = wordApp.Documents.Open(ref fileToOpen,
+               ref missing, ref wordFalse, ref wordFalse, ref missing,
+               ref missing, ref missing, ref missing, ref missing,
+               ref missing, ref missing, ref wordTrue, ref missing,
+               ref missing, ref missing, ref missing);
+
+            object fileToOpen1 = (Server.MapPath(@"~\Documents\UpdatedWord\" + code + ".docx"));
+            Microsoft.Office.Interop.Word.Document doc2 = wordApp.Documents.Open(ref fileToOpen1,
+                ref missing, ref wordFalse, ref wordFalse, ref missing,
+                ref missing, ref missing, ref missing, ref missing,
+                ref missing, ref missing, ref missing, ref missing,
+                ref missing, ref missing, ref missing);
+
+            Microsoft.Office.Interop.Word.Document doc = wordApp.CompareDocuments(doc1, doc2, WdCompareDestination.wdCompareDestinationRevised, WdGranularity.wdGranularityWordLevel,
+                true, true, true, true, true, true, true, true, true, true, "", true);
+            doc1.Close();
+            doc2.SaveAs(Server.MapPath(@"~\Documents\UpdatedWord\" + code + "changes.docx"));
+            doc2.Close();
+            ((_Application)wordApp).Quit();
+
+            try
+            {
+                string path = (Server.MapPath(@"~\Documents\UpdatedWord\" + code + "changes.docx"));
+
+                System.IO.FileInfo file = new System.IO.FileInfo(path);
+                if (file.Exists)
+                {
+                    Response.Clear();
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + file.Name);
+                    Response.AddHeader("Content-Length", file.Length.ToString());
+                    Response.ContentType = "application/octet-stream";
+                    Response.WriteFile(file.FullName);
+                    Response.End();
+                }
+                else
+                {
+                    MessageBox.Show("This file does not exist", "Error");
+                }
+            }
+            catch (NullReferenceException)
+            {
+                MessageBox.Show("This file does not exist", "Error");
+            }
+        }
+
+        protected void btnExportToWord1_Click(object sender, ImageClickEventArgs e)
+        {
+            try
+            {
+                string code = ((System.Web.UI.WebControls.Label)FormViewModuleTemplate.FindControl("ModuleCodeLabel")).Text.Replace("&nbsp;", " ");
+                string path = (Server.MapPath(@"~\Documents\UpdatedWord\" + code + ".docx"));
+
+                System.IO.FileInfo file = new System.IO.FileInfo(path);
+                if (file.Exists)
+                {
+                    Response.Clear();
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + file.Name);
+                    Response.AddHeader("Content-Length", file.Length.ToString());
+                    Response.ContentType = "application/octet-stream";
+                    Response.WriteFile(file.FullName);
+                    Response.End();
+                }
+                else
+                {
+                    MessageBox.Show("This file does not exist", "Error");
+                }
+            }
+            catch (NullReferenceException)
+            {
+                MessageBox.Show("This file does not exist", "Error");
+            }
+        }
+
+        protected void CustomValidator2_ServerValidate(object source, ServerValidateEventArgs args)
+        {
+            System.Web.UI.WebControls.Label test = new System.Web.UI.WebControls.Label();
+            test = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("Label32"));
+            System.Web.UI.WebControls.TextBox textbox1 = new System.Web.UI.WebControls.TextBox();
+            textbox1 = (System.Web.UI.WebControls.TextBox)(FormViewModuleTemplate.FindControl("TextBoxApproved"));
+            System.Web.UI.WebControls.Label label1 = new System.Web.UI.WebControls.Label();
+            label1 = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("ApprovedLabel"));
+
+            if (test.Text == "4")
+            {
+                if (textbox1.Text == label1.Text)
+                {
+                    args.IsValid = false;
+                }
+                else
+                {
+                    args.IsValid = true;
+                }
+            }
+            else
+            {
+                args.IsValid = true;
+            }
+        }
+
+        protected void DropDownList2_Load(object sender, EventArgs e)
+        {
+            System.Web.UI.WebControls.Label test = new System.Web.UI.WebControls.Label();
+            test = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("Label32"));
+            System.Web.UI.WebControls.DropDownList chk = new System.Web.UI.WebControls.DropDownList();
+            chk = (System.Web.UI.WebControls.DropDownList)(FormViewModuleTemplate.FindControl("DropDownList2"));
+
+            if (test.Text == "1")
+            {
+                ListItem removeItem1 = chk.Items.FindByValue("1");
+                chk.Items.Remove(removeItem1);
+                ListItem removeItem2 = chk.Items.FindByValue("2");
+                chk.Items.Remove(removeItem2);
+                ListItem removeItem3 = chk.Items.FindByValue("3");
+                chk.Items.Remove(removeItem3);
+                ListItem removeItem4 = chk.Items.FindByValue("4");
+                chk.Items.Remove(removeItem4);
+            }
+
+            else if (test.Text == "2")
+            {
+                ListItem removeItem2 = chk.Items.FindByValue("2");
+                chk.Items.Remove(removeItem2);
+                ListItem removeItem3 = chk.Items.FindByValue("3");
+                chk.Items.Remove(removeItem3);
+                ListItem removeItem4 = chk.Items.FindByValue("4");
+                chk.Items.Remove(removeItem4);
+            }
+
+            else if (test.Text == "3")
+            {
+                ListItem removeItem3 = chk.Items.FindByValue("3");
+                chk.Items.Remove(removeItem3);
+                ListItem removeItem4 = chk.Items.FindByValue("4");
+                chk.Items.Remove(removeItem4);
+            }
+
+            else if (test.Text == "4")
+            {
+                ListItem removeItem4 = chk.Items.FindByValue("4");
+                chk.Items.Remove(removeItem4);
+            }
+        }
+
+        protected void CustomValidatorSelectRole_ServerValidate(object source, ServerValidateEventArgs args)
+        {
+            System.Web.UI.WebControls.Label test = new System.Web.UI.WebControls.Label();
+            test = (System.Web.UI.WebControls.Label)(FormViewModuleTemplate.FindControl("Label32"));
+            System.Web.UI.WebControls.DropDownList chk = new System.Web.UI.WebControls.DropDownList();
+            chk = (System.Web.UI.WebControls.DropDownList)(FormViewModuleTemplate.FindControl("DropDownList2"));
+
+            if (chk.SelectedValue == "-1")
+            {
+                args.IsValid = false;
+            }
+            else
+            {
+                args.IsValid = true;
+            }
+        }
+
+        protected void CustomValidator3_ServerValidate(object source, ServerValidateEventArgs args)
+        {
+            System.Web.UI.WebControls.TextBox textbox2 = new System.Web.UI.WebControls.TextBox();
+            textbox2 = (System.Web.UI.WebControls.TextBox)(FormViewModuleTemplate.FindControl("TextBoxComment"));
+
+            if (textbox2.Text.Trim() == "")
+            {
+                args.IsValid = false;
+            }
+            else
+            {
+                args.IsValid = true;
+            }
+        }
+
+
+    }
+}

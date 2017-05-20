@@ -1,0 +1,166 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data.SqlClient;
+using System.Data;
+
+namespace ModuleSpecificationSite.Members
+{
+    public partial class ModuleEditDetails : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void lbInsertTutor_Click(object sender, EventArgs e)
+        {
+            //Inserts a new tutor
+            try
+            {
+                System.Web.UI.WebControls.DropDownList DropDownListTutor = new System.Web.UI.WebControls.DropDownList();
+                DropDownListTutor = (System.Web.UI.WebControls.DropDownList)(GridViewTutor.FooterRow.FindControl("ddpTutorNameInsert"));
+
+                System.Web.UI.WebControls.TextBox TextBoxTutor = new System.Web.UI.WebControls.TextBox();
+                TextBoxTutor = (System.Web.UI.WebControls.TextBox)(GridViewTutor.FooterRow.FindControl("tbTutorName"));
+
+                System.Web.UI.WebControls.Label TutorError = new System.Web.UI.WebControls.Label();
+                TutorError = (System.Web.UI.WebControls.Label)(GridViewTutor.FooterRow.FindControl("TutorError"));
+
+                //Checks to see if checkbox is empty or not
+                if (TextBoxTutor.Text.Trim() == "")
+                {
+                    //gives tutor error
+                    TutorError.Visible = true;
+                    lblTutorSuccessful.Visible = false;
+                }
+                else
+                {
+                    //inserts the new tutor into the sqldatasource
+                    SqlModuleLeader.InsertParameters["TutorName"].DefaultValue = TextBoxTutor.Text.Trim().ToString();
+                    SqlModuleLeader.InsertParameters["DeptID"].DefaultValue = DropDownListTutor.SelectedValue.ToString();
+
+                    SqlModuleLeader.Insert();
+
+                    SqlModuleLeader.DataBind();
+                    GridViewTutor.DataBind();
+                    TutorError.Visible = false;
+                    lblTutorSuccessful.Visible = true;
+                }
+            }
+            catch (SqlException)
+            {
+                //prompt error
+                lblTutorSuccessful.Visible = true;
+                lblTutorSuccessful.Text = "An error has occured.";
+            }
+        }
+
+        protected void lbInsertCourses_Click(object sender, EventArgs e)
+        {
+            //Inserts a new course
+            try
+            {
+                System.Web.UI.WebControls.TextBox Insertcourse = new System.Web.UI.WebControls.TextBox();
+                Insertcourse = (System.Web.UI.WebControls.TextBox)(GridViewCourses.FooterRow.FindControl("tbInsertCourse"));
+
+                System.Web.UI.WebControls.Label CourseError = new System.Web.UI.WebControls.Label();
+                CourseError = (System.Web.UI.WebControls.Label)(GridViewCourses.FooterRow.FindControl("CourseError"));
+                //Checks to see if textbox is empty or not
+                if (Insertcourse.Text.Trim() == "")
+                {
+                    //gives course error
+                    CourseError.Visible = true;
+                    lblCourseSuccessful.Visible = false;
+                }
+                else
+                {
+                    //inserts the new course into the sqldatasource
+                    SqlCourses.InsertParameters["CourseName"].DefaultValue = Insertcourse.Text.Trim().ToString();
+                    SqlCourses.Insert();
+                    SqlCourses.DataBind();
+                    GridViewCourses.DataBind();
+                    CourseError.Visible = false;
+                    lblCourseSuccessful.Visible = true;
+                }
+            }
+            catch (SqlException)
+            {
+                //prompt error
+                lblCourseSuccessful.Visible = true;
+                lblCourseSuccessful.Text = "An error has occured.";
+            }
+        }
+
+        protected void lbInsertLocation_Click(object sender, EventArgs e)
+        {
+            //Inserts a new location
+            try
+            {
+                System.Web.UI.WebControls.TextBox InsertLocation = new System.Web.UI.WebControls.TextBox();
+                InsertLocation = (System.Web.UI.WebControls.TextBox)(GridViewLocation.FooterRow.FindControl("tbInsertLocation"));
+
+                System.Web.UI.WebControls.Label LocationError = new System.Web.UI.WebControls.Label();
+                LocationError = (System.Web.UI.WebControls.Label)(GridViewLocation.FooterRow.FindControl("LocationError"));
+                //Checks to see if textbox is empty or not
+                if (InsertLocation.Text.Trim() == "")
+                {
+                    //gives location error
+                    LocationError.Visible = true;
+                    lblLocationSuccessful.Visible = false;
+                }
+                else
+                {
+                    //inserts the new location into the sqldatasource
+                    SqlLocation.InsertParameters["LocationName"].DefaultValue = InsertLocation.Text.Trim().ToString();
+
+                    SqlLocation.Insert();
+
+                    SqlLocation.DataBind();
+                    GridViewLocation.DataBind();
+                    LocationError.Visible = false;
+                    lblLocationSuccessful.Visible = true;
+                }
+            }
+            catch (SqlException)
+            {
+                //prompt error
+                lblLocationSuccessful.Visible = true;
+                lblLocationSuccessful.Text = "An error has occured.";
+            }
+        }
+
+        protected void GridViewTutor_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            //grabs the sql datasource select to find out how many are selected and uses
+            //this into the search found label to display
+            DataView dvTutor = (DataView)SqlModuleLeader.Select(DataSourceSelectArguments.Empty);
+            int RowCount = dvTutor.Count;
+            lblTutorRow.Text = String.Format("{0}", RowCount + " " + "record(s) were found using the keyword(s):" + " " + tbTutorSearch.Text);
+
+        }
+
+        protected void GridViewCourses_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            //grabs the sql datasource select to find out how many are selected and uses
+            //this into the search found label to display
+            DataView dvCourse = (DataView)SqlCourses.Select(DataSourceSelectArguments.Empty);
+            int RowCount = dvCourse.Count;
+            lblCourseRow.Text = String.Format("{0}", RowCount + " " + "record(s) were found using the keyword(s):" + " " + tbCourseSearch.Text);
+        }
+
+        protected void GridViewLocation_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            //grabs the sql datasource select to find out how many are selected and uses
+            //this into the search found label to display
+            DataView dvLocation = (DataView)SqlLocation.Select(DataSourceSelectArguments.Empty);
+            int RowCount = dvLocation.Count;
+            lblLocationRow.Text = String.Format("{0}", RowCount + " " + "record(s) were found using the keyword(s):" + " " + tbLocationSearch.Text);
+
+        }
+
+    }
+}

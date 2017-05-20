@@ -1,0 +1,123 @@
+<%@ Page Title="Module Search Page" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="ModuleSearch.aspx.cs" Inherits="ModuleSpecificationSite.Members.ModuleSpecSearch" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
+    <h2 style="text-align: center">
+        &nbsp;Module Specification Search Page</h2>
+    <br />
+    <asp:Panel ID="Panel1" runat="server">
+        <table style="width:100%;">
+            <tr>
+                <td style="width: 440px">
+                    &nbsp;<asp:TextBox ID="tbSearch" runat="server" MaxLength="50" Width="150px"></asp:TextBox>
+                    &nbsp;<asp:Button ID="btnSearch" runat="server" Font-Bold="True" 
+                        onclick="btnSearch_Click" Text="Search" />
+                    &nbsp;<asp:CheckBox ID="cbActiveModule" runat="server" AutoPostBack="True" 
+                        ForeColor="Black" Text="Select Active Modules" />
+                    <br />
+                    <asp:Label ID="lblSearchError" runat="server" ForeColor="#CC0000"></asp:Label>
+                    <br />
+                </td>
+                <td style="text-align: left; width: 115px; color: #000000;">
+                    Search By:<br /> Filter By School:<br />
+                </td>
+                <td style="text-align: left">
+                    <asp:DropDownList ID="dropdownSearchBy" runat="server" BackColor="White" 
+                        Font-Bold="True" Font-Names="Arial" Font-Size="Small" ForeColor="Black" 
+                        Width="120px">
+                        <asp:ListItem Value="ModuleCode">Module Code</asp:ListItem>
+                        <asp:ListItem Value="ModuleTitle">Module Title</asp:ListItem>
+                    </asp:DropDownList>
+                    <br />
+                    <asp:DropDownList ID="dropdownSchools" runat="server" AppendDataBoundItems="True" 
+                        AutoPostBack="True" BackColor="White" Font-Bold="True" ForeColor="Black" 
+                        ondatabound="dropdownSchools_DataBound" Width="350px" Font-Names="Arial" 
+                        Font-Size="Small">
+                        <asp:ListItem Value="-1">All</asp:ListItem>
+                        <asp:ListItem Value="1">School of Applied Sciences</asp:ListItem>
+                        <asp:ListItem Value="2">School of Art, Design and Architecture</asp:ListItem>
+                        <asp:ListItem Value="3">School of Business</asp:ListItem>
+                        <asp:ListItem Value="4">School of Computing and Engineering</asp:ListItem>
+                        <asp:ListItem Value="5">School of Education and Professional Development</asp:ListItem>
+                        <asp:ListItem Value="6">School of Human and Health Sciences</asp:ListItem>
+                        <asp:ListItem Value="7">School of Music, Humanities and Media</asp:ListItem>
+                    </asp:DropDownList>
+                </td>
+            </tr>
+        </table>
+    </asp:Panel>
+    <asp:Panel ID="Panel2" runat="server">
+        <asp:SqlDataSource ID="SqlModuleSearch" runat="server" 
+            ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>" 
+            FilterExpression="{0} LIKE '%{1}%'" 
+            
+            SelectCommand="SearchModuleInformation" 
+            SelectCommandType="StoredProcedure">
+            <FilterParameters>
+                <asp:ControlParameter ControlID="dropdownSearchBy" Name="DropDownList" 
+                    PropertyName="SelectedValue" />
+                <asp:ControlParameter ControlID="tbSearch" Name="Textbox" PropertyName="Text" />
+            </FilterParameters>
+            <SelectParameters>
+                <asp:ControlParameter ControlID="dropdownSchools" Name="SchoolsID" 
+                    PropertyName="SelectedValue" />
+                <asp:ControlParameter ControlID="cbActiveModule" Name="ActiveModule" 
+                    PropertyName="Checked" />
+            </SelectParameters>
+        </asp:SqlDataSource>
+        <asp:Label ID="lblSearchFound" runat="server" Font-Bold="True"></asp:Label>
+        <asp:GridView ID="gvModuleSearchBox" runat="server" AllowPaging="True" 
+            AutoGenerateColumns="False" BackColor="White" BorderColor="#CCCCCC" 
+            BorderStyle="Outset" BorderWidth="2px" CellPadding="3" DataKeyNames="ModuleID" 
+            DataSourceID="SqlModuleSearch" Font-Bold="True" 
+            HorizontalAlign="Center" 
+            onrowdatabound="gvModuleSearchBox_RowDataBound" 
+            onselectedindexchanged="gvModuleSearchBox_SelectedIndexChanged" 
+            onselectedindexchanging="gvModuleSearchBox_SelectedIndexChanging" 
+            ShowHeaderWhenEmpty="True" style="margin-right: 0px" Width="914px">
+            <SortedAscendingCellStyle BackColor="#F1F1F1" />
+            <SortedAscendingHeaderStyle BackColor="#007DBB" />
+            <SortedDescendingCellStyle BackColor="#CAC9C9" />
+            <SortedDescendingHeaderStyle BackColor="#00547E" />
+            <Columns>
+                <asp:TemplateField HeaderText="View" ShowHeader="False">
+                    <ItemTemplate>
+                        <asp:ImageButton ID="ImageButton1" runat="server" CausesValidation="False" 
+                            CommandName="Select" ImageUrl="~/Resources/viewbutton.png" />
+                    </ItemTemplate>
+                </asp:TemplateField>
+                <asp:BoundField DataField="ModuleID" HeaderText="ModuleID" 
+                    InsertVisible="False" ReadOnly="True" SortExpression="ModuleID" 
+                    Visible="False" />
+                <asp:TemplateField HeaderText="Module Code" SortExpression="ModuleCode">
+                    <ItemTemplate>
+                        <asp:Label ID="lblModuleCode" runat="server" Text='<%# Bind("ModuleCode") %>'></asp:Label>
+                    </ItemTemplate>
+                </asp:TemplateField>
+                <asp:TemplateField HeaderText="Module Title" SortExpression="ModuleTitle">
+                    <ItemTemplate>
+                        <asp:Label ID="lblModuleTitle" runat="server" 
+                            style="text-transform: capitalize" Text='<%# Bind("ModuleTitle") %>'></asp:Label>
+                    </ItemTemplate>
+                </asp:TemplateField>
+            </Columns>
+            <EmptyDataRowStyle Font-Bold="True" ForeColor="#CC3300" />
+            <EmptyDataTemplate>
+                <div style="text-align: center;">
+                    &nbsp;No Results Found</div>
+            </EmptyDataTemplate>
+            <FooterStyle BackColor="White" ForeColor="#000066" />
+            <HeaderStyle BackColor="#006699" Font-Bold="True" ForeColor="White" />
+            <PagerSettings Mode="NumericFirstLast" />
+            <PagerStyle BackColor="#006699" ForeColor="White" HorizontalAlign="Left" />
+            <RowStyle BackColor="#EEEEEE" ForeColor="Black" />
+            <SelectedRowStyle BackColor="#669999" Font-Bold="True" ForeColor="White" />
+            <SortedAscendingCellStyle BackColor="#F1F1F1" />
+            <SortedAscendingHeaderStyle BackColor="#007DBB" />
+            <SortedDescendingCellStyle BackColor="#CAC9C9" />
+            <SortedDescendingHeaderStyle BackColor="#00547E" />
+        </asp:GridView>
+        <br />
+        <br />
+    </asp:Panel>
+</asp:Content>

@@ -1,0 +1,81 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="ModuleSpecificationSite.SiteMaster" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head runat="server">
+    <title></title>
+    <link href="~/Styles/Site.css" rel="stylesheet" type="text/css" />
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form runat="server">
+    <div class="page">
+        <div class="header">
+            <div class="title">
+                <h1>
+                    MODULE SPECIFICATION SITE</h1>
+            </div>
+            <div class="loginDisplay">
+                <asp:LoginView ID="HeadLoginView" runat="server" EnableViewState="false">
+                    <AnonymousTemplate>
+                        [ <a href="~/Login.aspx" ID="HeadLoginStatus" runat="server">Log In</a> ]
+                    </AnonymousTemplate>
+                    <LoggedInTemplate>
+                        Welcome <span class="bold"><asp:LoginName ID="HeadLoginName" runat="server" /></span>!
+                        [ <asp:LoginStatus ID="HeadLoginStatus" runat="server" LogoutAction="Redirect" 
+                            LogoutText="Log Out" LogoutPageUrl="~/Login.aspx"/> ]
+                    </LoggedInTemplate>
+                </asp:LoginView>
+            </div>
+            <div class="clear hideSkiplink">
+                <asp:Menu ID="AdminNavigationMenu" runat="server" CssClass="menu" 
+                    EnableViewState="False" IncludeStyleBlock="False" 
+                    StaticSubMenuIndent="16px" Orientation="Horizontal" Visible="False">
+                    <Items>
+                        <asp:MenuItem NavigateUrl="~/Admin/AdminSearch.aspx" Text="Edit Modules" 
+                            Value="Admin Search"></asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/Admin/AdminNew.aspx" Text="New Module" 
+                            Value="Admin New"></asp:MenuItem>
+                        <asp:MenuItem Text="Export Modules" Value="Export Modules" 
+                            NavigateUrl="~/Admin/ModuleDocuments.aspx"></asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/Admin/ModuleEditDetails.aspx" Text="Add/Edit Details" 
+                            Value="Add/Edit Details"/>
+                        <asp:MenuItem Text="Module Tools" Value="Module Tools" 
+                            NavigateUrl="~/Admin/AdminTools.aspx"></asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/Admin/Register.aspx" Text="New Account" 
+                            Value="New Account">
+                            <asp:MenuItem NavigateUrl="~/Admin/ChangePassword.aspx" Text="Change Password" 
+                                Value="Change Password"></asp:MenuItem>
+                        </asp:MenuItem>
+                    </Items>
+                </asp:Menu>
+                <asp:Menu ID="NavigationMenu" runat="server" CssClass="menu" 
+                    EnableViewState="False" IncludeStyleBlock="False" 
+                    StaticSubMenuIndent="16px" Orientation="Horizontal" Visible="False">
+                    <Items>
+                        <asp:MenuItem NavigateUrl="~/Members/ModuleSearch.aspx" 
+                            Text="Module Search" Value="Module Search">
+                        </asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/Members/NewModule.aspx" Text="New Module" 
+                            Value="New Module"></asp:MenuItem>
+                        <asp:MenuItem 
+                            Text="Module Approval" Value="Module Approval" 
+                            NavigateUrl="~/Members/ModuleApprovalList.aspx"></asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/Members/ModuleProgress.aspx" 
+                            Text="Module Progress" Value="Module Progress"></asp:MenuItem>
+                    </Items>
+                </asp:Menu>
+            </div>
+        </div>
+        <div class="main">
+            <asp:ContentPlaceHolder ID="MainContent" runat="server"/>
+        </div>
+        <div class="clear">
+        </div>
+    </div>
+    <div class="footer">
+        
+    </div>
+    </form>
+</body>
+</html>

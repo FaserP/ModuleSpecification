@@ -1,0 +1,33 @@
+<%@ Page Title="Module Report Page" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="ModuleReport.aspx.cs" Inherits="ModuleSpecificationSite.Members.ModuleReport" %>
+<%@ Register assembly="Microsoft.ReportViewer.WebForms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" namespace="Microsoft.Reporting.WebForms" tagprefix="rsweb" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
+    <h2 style="text-align: center">
+        &nbsp;<asp:Label ID="lblStoreModuleCode" runat="server" Visible="False"></asp:Label>
+        Viewing Report -
+        <asp:Label ID="LabelCode" runat="server"></asp:Label>
+        <asp:Label ID="LabelTitle" runat="server"></asp:Label>
+    </h2>
+    <rsweb:ReportViewer ID="ReportViewer1" runat="server" Font-Names="Verdana" 
+        Font-Size="8pt" InteractiveDeviceInfos="(Collection)" 
+        WaitMessageFont-Names="Verdana" WaitMessageFont-Size="14pt" Width="919px" 
+        Height="545px">
+    <LocalReport ReportPath="Members\UpdatedModuleReport.rdlc">
+        <DataSources>
+            <rsweb:reportdatasource DataSourceId="SqlGetReport" Name="DataSet1" />
+        </DataSources>
+    </LocalReport>
+    </rsweb:ReportViewer>
+    <asp:SqlDataSource ID="SqlGetReport" runat="server" 
+        ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>" 
+        
+        SelectCommand="GetModuleChangesReport" SelectCommandType="StoredProcedure">
+        <SelectParameters>
+            <asp:ControlParameter ControlID="lblStoreModuleCode" Name="ModuleID" 
+                PropertyName="Text" />
+        </SelectParameters>
+    </asp:SqlDataSource>
+    <asp:ScriptManager ID="ScriptManager" runat="server">
+    </asp:ScriptManager>
+</asp:Content>

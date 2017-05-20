@@ -1,0 +1,22 @@
+-------------Active Users who have access to system------
+Catherine
+Pritpal
+---------------------------------------------------------
+
+
+-------------Test Accounts used for testing purposes-----
+
+Dr Rupert Ward		test12
+Head of Dept 		test12
+Head of Registry	test12
+Head of SAVP		test12
+Registry Admin		test12
+SAVP Admin		test12
+Subject Leader		test12
+Tutor			test12
+---------------------------------------------------------
+
+-------------Admin Login for system---------------------
+Test			test12
+FaserAdmin		testadmin12
+--------------------------------------------------------		

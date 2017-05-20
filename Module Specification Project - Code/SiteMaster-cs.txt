@@ -1,0 +1,55 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace ModuleSpecificationSite
+{
+    public partial class SiteMaster : System.Web.UI.MasterPage
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (Page.User.Identity.IsAuthenticated)
+            {
+                if (Page.User.IsInRole("Admin"))
+                {
+                    NavigationMenu.Visible = true;
+                    AdminNavigationMenu.Visible = true;
+                    System.Web.UI.WebControls.MenuItem memberSearch = NavigationMenu.FindItem("Module Search");
+                    System.Web.UI.WebControls.MenuItem memberNew = NavigationMenu.FindItem("New Module");
+                    NavigationMenu.Items.Remove(memberSearch);
+                    NavigationMenu.Items.Remove(memberNew);
+                }
+                else if (Page.User.IsInRole("SAVP Admin") || Page.User.IsInRole("Head SAVP"))
+                {
+                    NavigationMenu.Visible = true;
+                }
+                else if (Page.User.IsInRole("Registry Admin") || Page.User.IsInRole("Head of Registry"))
+                {
+                    NavigationMenu.Visible = true;
+                }
+                else if (Page.User.IsInRole("Subject Leader") || Page.User.IsInRole("Head Department"))
+                {
+                    NavigationMenu.Visible = true;
+                    System.Web.UI.WebControls.MenuItem memberProgress = NavigationMenu.FindItem("Module Progress");
+                    NavigationMenu.Items.Remove(memberProgress);
+
+                }
+                else
+                {
+                    NavigationMenu.Visible = true;
+                    System.Web.UI.WebControls.MenuItem memberApproval = NavigationMenu.FindItem("Module Approval");
+                    System.Web.UI.WebControls.MenuItem memberProgress = NavigationMenu.FindItem("Module Progress");
+                    NavigationMenu.Items.Remove(memberApproval);
+                    NavigationMenu.Items.Remove(memberProgress);
+                }
+            }
+            else
+            {
+                NavigationMenu.Visible = false;
+            }
+        }
+    }
+}

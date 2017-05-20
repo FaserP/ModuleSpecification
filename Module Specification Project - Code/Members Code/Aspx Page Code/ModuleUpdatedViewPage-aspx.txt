@@ -1,0 +1,1044 @@
+<%@ Page Title="Updated Module Spec View Page" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="ModuleUpdatedViewPage.aspx.cs" Inherits="ModuleSpecificationSite.Members.ModuleUpdatedViewPage" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
+    <h2 style="text-align: center">
+        <asp:Label ID="lblStoreModuleCode" runat="server" Visible="False"></asp:Label>
+        <asp:Label ID="LabelCode" runat="server" Visible="False"></asp:Label>
+    </h2>
+    <asp:SqlDataSource ID="SqlDataSourceModuleTemplate" runat="server" 
+        ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>" 
+        SelectCommand="SelectTempModuleInformation" 
+        UpdateCommand="ApprovalProcess" UpdateCommandType="StoredProcedure" 
+        SelectCommandType="StoredProcedure">
+        <SelectParameters>
+            <asp:ControlParameter ControlID="lblStoreModuleCode" Name="ModuleID" 
+                PropertyName="Text" />
+        </SelectParameters>
+        <UpdateParameters>
+            <asp:Parameter Name="ModuleID" Type="Int32" />
+            <asp:Parameter Name="ModuleCode" Type="String" />
+            <asp:Parameter Name="ModuleTitle" Type="String" />
+            <asp:Parameter Name="CreditRating" Type="String" />
+            <asp:Parameter Name="ModuleRating" Type="String" />
+            <asp:Parameter Name="Pre_Requisites" Type="String" />
+            <asp:Parameter Name="R_P_S" Type="String" />
+            <asp:Parameter Name="Co_Requisites" Type="String" />
+            <asp:Parameter Name="SharedTeaching" Type="String" />
+            <asp:Parameter Name="P_B_R" Type="String" />
+            <asp:Parameter Name="Graded" Type="String" />
+            <asp:Parameter Name="BarredCombination" Type="String" />
+            <asp:Parameter Name="Synopsis" Type="String" />
+            <asp:Parameter Name="Syllabus" Type="String" />
+            <asp:Parameter Name="Strategy" Type="String" />
+            <asp:Parameter Name="ResourcesRequired" Type="String" />
+            <asp:Parameter Name="ReadingList" Type="String" />
+            <asp:Parameter Name="Approved" Type="String" />
+            <asp:Parameter Name="LearningOutcomes" Type="String" />
+            <asp:Parameter Name="Knowledge" Type="String" />
+            <asp:Parameter Name="Abilities" Type="String" />
+            <asp:Parameter Name="AssessmentStrategy" Type="String" />
+            <asp:Parameter Name="Formative" Type="String" />
+            <asp:Parameter Name="Summative" Type="String" />
+            <asp:Parameter Name="Tasks" Type="String" />
+            <asp:Parameter Name="Criteria" Type="String" />
+            <asp:Parameter Name="SchoolID" Type="Int32" />
+            <asp:Parameter Name="SchoolName" Type="String" />
+            <asp:Parameter Name="Compulsory" Type="String" />
+            <asp:Parameter Name="Core" Type="String" />
+            <asp:Parameter Name="Optional" Type="String" />
+            <asp:Parameter Name="StandAlone" Type="String" />
+            <asp:Parameter Name="Lecture" Type="Decimal" />
+            <asp:Parameter Name="Seminar" Type="Decimal" />
+            <asp:Parameter Name="TutorialAndProject" Type="Decimal" />
+            <asp:Parameter Name="PracticalAndDemonstrations" Type="Decimal" />
+            <asp:Parameter Name="StudioAndWorkshop" Type="Decimal" />
+            <asp:Parameter Name="FieldworkAndExternal" Type="Decimal" />
+            <asp:Parameter Name="WorkbasedLearning" Type="Decimal" />
+            <asp:Parameter Name="Placement" Type="Decimal" />
+            <asp:Parameter Name="IndependentStudy" Type="Decimal" />
+            <asp:Parameter Name="TotalHours" Type="Decimal" />
+            <asp:Parameter Name="ModuleAims" Type="String" />
+            <asp:Parameter Name="ModuleScheme" Type="String" />
+            <asp:Parameter Name="OtherInfo" Type="String" />
+            <asp:Parameter Name="ModuleStatus" Type="String" />
+            <asp:Parameter Name="Approval" Type="Int32" />
+            <asp:Parameter Name="ApprovalStatus" Type="Int32" />
+            <asp:Parameter Name="ApprovalPerson" Type="Int32" />
+            <asp:Parameter Name="Comment" Type="String" />
+        </UpdateParameters>
+    </asp:SqlDataSource>
+    <asp:SqlDataSource ID="SqlDataSourceTempCourse" runat="server" 
+                ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>" 
+                DeleteCommand="DeleteTempCourses" 
+                InsertCommand="InsertTempCourse" 
+                SelectCommand="SelectTempCourses" 
+                onselected="SqlDataSourceTempCourse_Selected" 
+        DeleteCommandType="StoredProcedure" InsertCommandType="StoredProcedure" 
+        SelectCommandType="StoredProcedure">
+        <DeleteParameters>
+            <asp:Parameter Name="ModuleID" Type="Int32" />
+            <asp:Parameter Name="CourseID" Type="Int32" />
+        </DeleteParameters>
+        <InsertParameters>
+            <asp:Parameter Name="ModuleID" Type="Int32" />
+            <asp:Parameter Name="CourseID" Type="Int32" />
+            <asp:Parameter Name="CourseName" Type="String" />
+        </InsertParameters>
+        <SelectParameters>
+            <asp:ControlParameter ControlID="lblStoreModuleCode" Name="ModuleID" 
+                        PropertyName="Text" />
+        </SelectParameters>
+    </asp:SqlDataSource>
+    <asp:SqlDataSource ID="SqlDataSourceTempTutor" runat="server" 
+        ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>" 
+        DeleteCommand="DeleteTempTutors" 
+        InsertCommand="InsertTempTutor"         
+        SelectCommand="SelectTempTutors" 
+        onselected="SqlDataSourceTempTutor_Selected" 
+        DeleteCommandType="StoredProcedure" InsertCommandType="StoredProcedure" 
+        SelectCommandType="StoredProcedure">
+        <DeleteParameters>
+            <asp:Parameter Name="ModuleID" Type="Int32" />
+            <asp:Parameter Name="TutorID" Type="Int32" />
+        </DeleteParameters>
+        <InsertParameters>
+            <asp:Parameter Name="ModuleID" Type="Int32" />
+            <asp:Parameter Name="TutorID" Type="Int32" />
+            <asp:Parameter Name="TutorName" Type="String" />
+        </InsertParameters>
+        <SelectParameters>
+            <asp:ControlParameter ControlID="lblStoreModuleCode" Name="ModuleID" 
+                PropertyName="Text" Type="Int32" />
+        </SelectParameters>
+    </asp:SqlDataSource>
+    <asp:SqlDataSource ID="SqlDataSourceTempLocation" runat="server" 
+        ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>" 
+        DeleteCommand="DeleteModuleLocation" 
+        InsertCommand="InsertTempLocation"                  
+        SelectCommand="SelectTempLocations" 
+        onselected="SqlDataSourceTempLocation_Selected" 
+        DeleteCommandType="StoredProcedure" InsertCommandType="StoredProcedure" 
+        SelectCommandType="StoredProcedure">
+        <DeleteParameters>
+            <asp:Parameter Name="ModuleID" Type="Int32" />
+            <asp:Parameter Name="LocationID" Type="Int32" />
+        </DeleteParameters>
+        <InsertParameters>
+            <asp:Parameter Name="ModuleID" Type="Int32" />
+            <asp:Parameter Name="LocationID" Type="Int32" />
+            <asp:Parameter Name="LocationName" Type="String" />
+        </InsertParameters>
+        <SelectParameters>
+            <asp:ControlParameter ControlID="lblStoreModuleCode" Name="ModuleID" 
+                                    PropertyName="Text" />
+        </SelectParameters>
+    </asp:SqlDataSource>
+    <asp:SqlDataSource ID="SqlDataSourceTempTable" runat="server" 
+        ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>" 
+        OldValuesParameterFormatString="original_{0}" 
+        SelectCommand="SelectTempAssessmentTable" 
+        onselected="SqlDataSourceTempTable_Selected" 
+        SelectCommandType="StoredProcedure">
+        <SelectParameters>
+            <asp:ControlParameter ControlID="lblStoreModuleCode" Name="ModuleID" 
+                                    PropertyName="Text" Type="Int32" />
+        </SelectParameters>
+    </asp:SqlDataSource>
+    <asp:SqlDataSource ID="SqlDataSourceComments" runat="server" 
+        ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>"   
+        SelectCommand="SelectLastApprovedComment" 
+        DeleteCommand="DeleteComments" 
+        InsertCommand="InsertTempComments" InsertCommandType="StoredProcedure" 
+        SelectCommandType="StoredProcedure" DeleteCommandType="StoredProcedure">
+        <DeleteParameters>
+            <asp:Parameter Name="ProgressID" Type="Int32" />
+        </DeleteParameters>
+        <InsertParameters>
+            <asp:Parameter Name="ModuleCode" />
+            <asp:Parameter Name="ApprovalStatus" />
+            <asp:Parameter Name="UsernameFrom" />
+            <asp:Parameter Name="RoleFrom" />
+            <asp:Parameter Name="EmailFrom" Type="String" />
+            <asp:Parameter Name="UserNameTo" />
+            <asp:Parameter Name="RoleTo" />
+            <asp:Parameter Name="EmailTo" Type="String" />
+            <asp:Parameter Name="Comments" />
+        </InsertParameters>
+        <SelectParameters>
+            <asp:ControlParameter ControlID="LabelCode" Name="ModuleCode" 
+                PropertyName="Text" />
+        </SelectParameters>
+    </asp:SqlDataSource>
+    <div>
+        <table style="width:100%;">
+            <tr>
+                <td style="width: 150px; text-align: center;">
+                            <asp:ImageButton ID="btnExportToWord" runat="server" Height="42px" 
+                        ImageUrl="~/Resources/word.png" onclick="btnExportToWord_Click" 
+                        style="margin-bottom: 0px" Width="42px" />
+                    <br />
+                <asp:Label ID="Label29" runat="server" Text="View Orginal Version"></asp:Label>
+                </td>
+                <td style="width: 300px; text-align: center;">
+                            <asp:ImageButton ID="btnExportToWord0" runat="server" Height="42px" 
+                        ImageUrl="~/Resources/word.png" onclick="btnExportToWord0_Click" 
+                        style="margin-bottom: 0px" Width="42px" />
+                    <br />
+                <asp:Label ID="Label30" runat="server" Text="View Updated Version (Track changes)"></asp:Label>
+                </td>
+                <td style="text-align: center; width: 150px;">
+                            <asp:ImageButton ID="btnExportToWord1" runat="server" Height="42px" 
+                        ImageUrl="~/Resources/word.png" onclick="btnExportToWord1_Click" 
+                        style="margin-bottom: 0px" Width="42px" />
+                    <br />
+                <asp:Label ID="Label31" runat="server" Text="View Updated Version"></asp:Label>
+                </td>
+                <td style="text-align: right">
+                    <asp:HyperLink ID="HyperLink1" runat="server" 
+                    NavigateUrl="~/Members/ModuleReport.aspx" Target="_blank">View Changes Report</asp:HyperLink>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <asp:Button ID="BackSearchButton" runat="server" 
+                PostBackUrl="~/Members/ModuleApprovalList.aspx" Text="Return to Search" 
+                Width="113px" />
+                </td>
+            </tr>
+    </table>
+    <asp:FormView ID="FormViewModuleTemplate" runat="server" 
+        DataSourceID="SqlDataSourceModuleTemplate" DefaultMode="Edit" Width="902px" 
+    onitemupdated="FormView1_ItemUpdated" style="margin-right: 0px" 
+            DataKeyNames="ModuleID,SchoolID">
+        <EditItemTemplate>
+            <asp:Panel ID="Panel1" runat="server" Visible="False">
+                <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="False" 
+                    BorderColor="Red" BorderStyle="Dashed" BorderWidth="2px" 
+                    DataKeyNames="ProgressID" DataSourceID="SqlDataSourceComments" Width="914px">
+                    <Columns>
+                        <asp:BoundField DataField="ProgressID" HeaderText="ProgressID" 
+                            InsertVisible="False" ReadOnly="True" SortExpression="ProgressID" 
+                            Visible="False" />
+                        <asp:BoundField DataField="ApprovalStatus" HeaderText="Status" 
+                            SortExpression="ApprovalStatus" />
+                        <asp:BoundField DataField="UsernameFrom" HeaderText="From" 
+                            SortExpression="UsernameFrom" />
+                        <asp:BoundField DataField="Comments" HeaderText="Comments Made" 
+                            NullDisplayText="No Comments" SortExpression="Comments" />
+                    </Columns>
+                </asp:GridView>
+                You must make a comment about rejecting the module and select a individual to 
+                send the module back to.<br /> <asp:TextBox ID="TextBoxComment" runat="server" 
+                    Height="50px" Text='<%# Bind("Comment") %>' TextMode="MultiLine" Width="905px"></asp:TextBox>
+                <br />
+                <asp:CustomValidator ID="CustomValidator3" runat="server" 
+                    ErrorMessage="Please insert a comment" Font-Bold="True" ForeColor="Red" 
+                    onservervalidate="CustomValidator3_ServerValidate"></asp:CustomValidator>
+                <br />
+                Select a role individual:
+                <asp:DropDownList ID="DropDownList2" runat="server" AutoPostBack="True" 
+                    onload="DropDownList2_Load" SelectedValue='<%# Bind("ApprovalPerson") %>' 
+                    Visible="False" Width="150px">
+                    <asp:ListItem Value="-1">--Select One--</asp:ListItem>
+                    <asp:ListItem Value="0">Module Leader</asp:ListItem>
+                    <asp:ListItem Value="1">Subject Leader</asp:ListItem>
+                    <asp:ListItem Value="2">Head of Department</asp:ListItem>
+                    <asp:ListItem Value="3">SAVP Administrator</asp:ListItem>
+                    <asp:ListItem Value="4">Chair of SAVP</asp:ListItem>
+                </asp:DropDownList>
+                &nbsp;<asp:CustomValidator ID="CustomValidatorSelectRole" runat="server" 
+                    ForeColor="Red" onservervalidate="CustomValidatorSelectRole_ServerValidate">You must select a role before confirming</asp:CustomValidator>
+            </asp:Panel>
+            <div style="text-align: center">
+                <asp:DropDownList ID="DropDownList1" runat="server" 
+                    SelectedValue='<%# Bind("Approval") %>' AutoPostBack="True" Width="150px">
+                    <asp:ListItem Value="1">Select an Option</asp:ListItem>
+                    <asp:ListItem Value="2">Approved</asp:ListItem>
+                    <asp:ListItem Value="3">Rejected</asp:ListItem>
+                </asp:DropDownList>
+                &nbsp;<asp:Button ID="UpdateButton" runat="server" CausesValidation="True" 
+                    CommandName="Update" Height="26px" Text="Confirm" />
+                <asp:Label ID="Label32" runat="server" Text='<%# Bind("ApprovalStatus") %>' 
+                    Visible="False"></asp:Label>
+                </div>
+            <table style="width:100%;">
+                <tr style="font-family: Calibri; font-size: 25px; color: #FFFFFF; font-weight: bold; background-color: #006699;">
+                    <td align="center">
+                        <asp:Label ID="ModuleCodeLabel" runat="server" 
+                            Text='<%# Bind("ModuleCode") %>' />
+                        &nbsp;-
+                        <asp:Label ID="ModuleTitleLabel" runat="server" 
+                            Text='<%# Bind("ModuleTitle") %>' />
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <asp:Panel ID="SchoolPanel" runat="server">
+                <table style="width:100%;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                            School/s Involved In Delivery:</td>
+                        <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                            <asp:Label ID="SchoolNameLabel" runat="server" 
+                                Text='<%# Bind("SchoolName") %>' />
+                        </td>
+                    </tr>
+                </table>
+                <br />
+            </asp:Panel>
+            <asp:Panel ID="PanelScheme" runat="server" Visible='<%#Eval("ModuleScheme")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                            Module Scheme:</td>
+                        <td class="style19" 
+                            style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                            <asp:Label ID="ModuleSchemeLabel" runat="server" 
+                                Text='<%# Bind("ModuleScheme") %>' />
+                        </td>
+                    </tr>
+                </table>
+                <br />
+            </asp:Panel>
+            <asp:Panel ID="CoursePanel" runat="server" Width="914px">
+                <table style="width:100%;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                            <asp:CheckBox ID="cbCourses" runat="server" Visible="False" Checked="True" />
+                            Name of Course(s):</td>
+                        <td align="justify">
+                            <asp:GridView ID="GridViewCourseDetails" runat="server" 
+                                AutoGenerateColumns="False" BackColor="White" BorderColor="#999999" 
+                                BorderStyle="None" BorderWidth="1px" CellPadding="3" DataSourceID="SqlDataSourceTempCourse" 
+                                GridLines="Vertical" ShowHeader="False" Width="536px">
+                                <AlternatingRowStyle BackColor="#DCDCDC" />
+                                <Columns>
+                                    <asp:BoundField DataField="ModuleID" HeaderText="ModuleID" ReadOnly="True" 
+                                        SortExpression="ModuleID" Visible="False" />
+                                    <asp:BoundField DataField="CourseID" HeaderText="CourseID" ReadOnly="True" 
+                                        SortExpression="CourseID" Visible="False" />
+                                    <asp:BoundField DataField="CourseName" HeaderText="CourseName" 
+                                        SortExpression="CourseName" />
+                                </Columns>
+                                <FooterStyle BackColor="#CCCCCC" ForeColor="Black" />
+                                <HeaderStyle BackColor="#000084" Font-Bold="True" ForeColor="White" />
+                                <PagerStyle BackColor="#999999" ForeColor="Black" HorizontalAlign="Center" />
+                                <RowStyle BackColor="#EEEEEE" ForeColor="Black" />
+                                <SelectedRowStyle BackColor="#008A8C" Font-Bold="True" ForeColor="White" />
+                                <SortedAscendingCellStyle BackColor="#F1F1F1" />
+                                <SortedAscendingHeaderStyle BackColor="#0000A9" />
+                                <SortedDescendingCellStyle BackColor="#CAC9C9" />
+                                <SortedDescendingHeaderStyle BackColor="#000065" />
+                            </asp:GridView>
+                        </td>
+                    </tr>
+                </table>
+                <br />
+            </asp:Panel>
+            <asp:Panel ID="TutorPanel" runat="server" Width="914px">
+                <table style="width:100%;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                            <asp:CheckBox ID="cbTutors" runat="server" Visible="False" Checked="True" />
+                            Module Leader:</td>
+                        <td align="justify">
+                            <asp:GridView ID="GridViewTutorDetails" runat="server" 
+                                AutoGenerateColumns="False" BackColor="White" BorderColor="#999999" 
+                                BorderStyle="None" BorderWidth="1px" CellPadding="3" DataSourceID="SqlDataSourceTempTutor" 
+                                GridLines="Vertical" ShowHeader="False" Width="536px">
+                                <AlternatingRowStyle BackColor="#DCDCDC" />
+                                <Columns>
+                                    <asp:BoundField DataField="ModuleID" HeaderText="ModuleID" ReadOnly="True" 
+                                        SortExpression="ModuleID" Visible="False" />
+                                    <asp:BoundField DataField="TutorID" HeaderText="TutorID" ReadOnly="True" 
+                                        SortExpression="TutorID" Visible="False" />
+                                    <asp:BoundField DataField="ModuleLeader" HeaderText="ModuleLeader" 
+                                        SortExpression="ModuleLeader" />
+                                </Columns>
+                                <FooterStyle BackColor="#CCCCCC" ForeColor="Black" />
+                                <HeaderStyle BackColor="#000084" Font-Bold="True" ForeColor="White" />
+                                <PagerStyle BackColor="#999999" ForeColor="Black" HorizontalAlign="Center" />
+                                <RowStyle BackColor="#EEEEEE" ForeColor="Black" />
+                                <SelectedRowStyle BackColor="#008A8C" Font-Bold="True" ForeColor="White" />
+                                <SortedAscendingCellStyle BackColor="#F1F1F1" />
+                                <SortedAscendingHeaderStyle BackColor="#0000A9" />
+                                <SortedDescendingCellStyle BackColor="#CAC9C9" />
+                                <SortedDescendingHeaderStyle BackColor="#000065" />
+                            </asp:GridView>
+                        </td>
+                    </tr>
+                </table>
+                <br />
+            </asp:Panel>
+            <asp:Panel ID="LocationPanel" runat="server" Width="914px">
+                <table style="width:100%;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                            <asp:CheckBox ID="cbLocation" runat="server" Visible="False" Checked="True" />
+                            Location:</td>
+                        <td>
+                            <asp:GridView ID="GridViewLocationDetails" runat="server" 
+                                AutoGenerateColumns="False" BackColor="White" BorderColor="#999999" 
+                                BorderStyle="None" BorderWidth="1px" CellPadding="3" DataSourceID="SqlDataSourceTempLocation" 
+                                GridLines="Vertical" ShowHeader="False" Width="536px">
+                                <AlternatingRowStyle BackColor="#DCDCDC" />
+                                <Columns>
+                                    <asp:BoundField DataField="ModuleID" HeaderText="ModuleID" ReadOnly="True" 
+                                        SortExpression="ModuleID" Visible="False" />
+                                    <asp:BoundField DataField="LocationID" HeaderText="LocationID" ReadOnly="True" 
+                                        SortExpression="LocationID" Visible="False" />
+                                    <asp:BoundField DataField="LocationName" HeaderText="LocationName" 
+                                        SortExpression="LocationName" />
+                                </Columns>
+                                <FooterStyle BackColor="#CCCCCC" ForeColor="Black" />
+                                <HeaderStyle BackColor="#000084" Font-Bold="True" ForeColor="White" />
+                                <PagerStyle BackColor="#999999" ForeColor="Black" HorizontalAlign="Center" />
+                                <RowStyle BackColor="#EEEEEE" ForeColor="Black" />
+                                <SelectedRowStyle BackColor="#008A8C" Font-Bold="True" ForeColor="White" />
+                                <SortedAscendingCellStyle BackColor="#F1F1F1" />
+                                <SortedAscendingHeaderStyle BackColor="#0000A9" />
+                                <SortedDescendingCellStyle BackColor="#CAC9C9" />
+                                <SortedDescendingHeaderStyle BackColor="#000065" />
+                            </asp:GridView>
+                        </td>
+                    </tr>
+                </table>
+                <br />
+            </asp:Panel>
+            <asp:Panel ID="StatusPanel" runat="server" Visible='<%#Eval("ModuleStatus")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                            Module Status:</td>
+                        <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                            <asp:Label ID="ModuleStatusLabel" runat="server" 
+                                Text='<%# Bind("ModuleStatus") %>' />
+                        </td>
+                    </tr>
+                </table>
+                <br />
+            </asp:Panel>
+            <table style="width:100%;">
+                <tr>
+                    <td class="TemplateSubHeader" 
+                        style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                        Module Type:</td>
+                    <td align="justify">
+                        <asp:Panel ID="CompulsoryPanel" runat="server" BackColor="#EEEEEE" 
+                                   Visible='<%#Eval("Compulsory")!=DBNull.Value%>'>
+                            <asp:Label ID="CompulsoryLabel" runat="server" 
+                                Text='<%# Bind("Compulsory") %>' />
+                        </asp:Panel>
+                        <asp:Panel ID="CorePanel" runat="server" BackColor="#EEEEEE"
+                                    Visible='<%#Eval("Core")!=DBNull.Value%>'>
+                            <asp:Label ID="CoreLabel" runat="server" 
+                                Text='<%# Bind("Core") %>' />
+                        </asp:Panel>
+                        <asp:Panel ID="OptionalPanel" runat="server" BackColor="#EEEEEE"
+                                    Visible='<%#Eval("Optional")!=DBNull.Value%>'>
+                            <asp:Label ID="OptionalLabel" runat="server" Text='<%# Bind("Optional") %>' />
+                        </asp:Panel>
+                        <asp:Panel ID="StandPanel" runat="server" BackColor="#EEEEEE"
+                                    Visible='<%#Eval("StandAlone")!=DBNull.Value%>'>
+                            <asp:Label ID="StandAloneLabel" runat="server" 
+                                Text='<%# Bind("StandAlone") %>' />
+                        </asp:Panel>
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <table style="width:100%;">
+                <tr>
+                    <td class="TemplateSubHeader" 
+                        style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                        Credit Rating:</td>
+                    <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                        <asp:Label ID="CreditRatingLabel" runat="server" 
+                            Text='<%# Bind("CreditRating") %>' />
+                    </td>
+                </tr>
+            </table>
+            <table style="width:100%;">
+                <tr>
+                    <td class="TemplateSubHeader" 
+                        style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                        Level:</td>
+                    <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                        <asp:Label ID="ModuleRatingLabel" runat="server" 
+                            Text='<%# Bind("ModuleRating") %>' />
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <table style="width:100%;">
+                <tr>
+                    <td class="TemplateSubHeader" 
+                        style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                        Learning Methods:</td>
+                    <td align="justify">
+                        <table style="width:100%;">
+                            <tr>
+                                <td align="justify">
+                                    <asp:Panel ID="LecturePanel" runat="server" BackColor="#EEEEEE"
+                                    Visible='<%# Eval("Lecture").ToString() == "0.0" ? false : true %>' >
+                                        <table style="width:100%;">
+                                            <tr>
+                                                <td class="LearningMethodsLayout">
+                                                    Lecture:</td>
+                                                <td>
+                                                    <asp:Label ID="LectureLabel" runat="server" 
+                                                        Text='<%# Bind("Lecture") %>' />
+                                                    &nbsp;hours</td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                    <asp:Panel ID="SeminarPanel" runat="server" BackColor="#EEEEEE"
+                                    Visible='<%# Eval("Seminar").ToString() == "0.0" ? false : true %>' >
+                                        <table style="width:100%;">
+                                            <tr>
+                                                <td class="LearningMethodsLayout">
+                                                    Seminar:</td>
+                                                <td>
+                                                    <asp:Label ID="SeminarLabel" runat="server" 
+                                                        Text='<%# Bind("Seminar") %>' />
+                                                    &nbsp;hours</td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                    <asp:Panel ID="TutorialPanel" runat="server" BackColor="#EEEEEE"
+                                    Visible='<%# Eval("TutorialAndProject").ToString() == "0.0" ? false : true %>' >
+                                        <table style="width:100%;">
+                                            <tr>
+                                                <td class="LearningMethodsLayout">
+                                                    Tutorial and Project:</td>
+                                                <td>
+                                                    <asp:Label ID="TutorialAndProjectLabel" runat="server" 
+                                                        Text='<%# Bind("TutorialAndProject") %>' />
+                                                    &nbsp;hours</td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                    <asp:Panel ID="PracticalPanel" runat="server" BackColor="#EEEEEE"
+                                    Visible='<%# Eval("PracticalAndDemonstrations").ToString() == "0.0" ? false : true %>' >
+                                        <table style="width:100%;">
+                                            <tr>
+                                                <td class="LearningMethodsLayout">
+                                                    Practical and Demonstrations:</td>
+                                                <td>
+                                                    <asp:Label ID="PracticalAndDemonstrationsLabel" runat="server" 
+                                                        Text='<%# Bind("PracticalAndDemonstrations") %>' />
+                                                    &nbsp;hours</td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                    <asp:Panel ID="StudioPanel" runat="server" BackColor="#EEEEEE"
+                                    Visible='<%# Eval("StudioAndWorkshop").ToString() == "0.0" ? false : true %>' >
+                                        <table style="width:100%;">
+                                            <tr>
+                                                <td class="LearningMethodsLayout">
+                                                    Studio and Workshop:</td>
+                                                <td>
+                                                    <asp:Label ID="StudioAndWorkshopLabel" runat="server" 
+                                                        Text='<%# Bind("StudioAndWorkshop") %>' />
+                                                    &nbsp;hours</td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                    <asp:Panel ID="FieldworkPanel" runat="server" BackColor="#EEEEEE"
+                                    Visible='<%# Eval("FieldworkAndExternal").ToString() == "0.0" ? false : true %>' >
+                                        <table style="width:100%;">
+                                            <tr>
+                                                <td class="LearningMethodsLayout">
+                                                    Fieldwork and External:</td>
+                                                <td>
+                                                    <asp:Label ID="FieldworkAndExternalLabel" runat="server" 
+                                                        Text='<%# Bind("FieldworkAndExternal") %>' />
+                                                    &nbsp;hours</td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                    <asp:Panel ID="WorkbasedPanel" runat="server" BackColor="#EEEEEE"
+                                    Visible='<%# Eval("WorkbasedLearning").ToString() == "0.0" ? false : true %>' >
+                                        <table style="width:100%;">
+                                            <tr>
+                                                <td class="LearningMethodsLayout">
+                                                    Workbased Learning:</td>
+                                                <td>
+                                                    <asp:Label ID="WorkbasedLearningLabel" runat="server" 
+                                                        Text='<%# Bind("WorkbasedLearning") %>' />
+                                                    &nbsp;hours</td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                    <asp:Panel ID="PlacementPanel" runat="server" BackColor="#EEEEEE"
+                                    Visible='<%# Eval("Placement").ToString() == "0.0" ? false : true %>' >
+                                        <table style="width:100%;">
+                                            <tr>
+                                                <td class="LearningMethodsLayout">
+                                                    Placement:&nbsp;</td>
+                                                <td>
+                                                    <asp:Label ID="PlacementLabel" runat="server" 
+                                                        Text='<%# Bind("Placement") %>' />
+                                                    &nbsp;hours</td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                    <asp:Panel ID="StudyPanel" runat="server" BackColor="#EEEEEE"
+                                    Visible='<%# Eval("IndependentStudy").ToString() == "0.0" ? false : true %>' >
+                                        <table style="width:100%;">
+                                            <tr>
+                                                <td class="LearningMethodsLayout">
+                                                    Independent Study:&nbsp;</td>
+                                                <td>
+                                                    <asp:Label ID="IndependentStudyLabel" runat="server" 
+                                                        Text='<%# Bind("IndependentStudy") %>' />
+                                                    &nbsp;hours</td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                    <asp:Panel ID="TotalPanel" runat="server" BackColor="#EEEEEE">
+                                        <table style="width: 100%;">
+                                            <tr>
+                                                <td class="LearningMethodsLayout">
+                                                    <asp:CheckBox ID="CheckBoxTotal" runat="server" Checked="True" 
+                                                        Visible="False" />
+                                                    Total Hours:</td>
+                                                <td>
+                                                    <asp:Label ID="TotalHoursLabel" runat="server" 
+                                                        Text='<%# Bind("TotalHours", "{0:#.##}") %>' />
+                                                    &nbsp;hours</td>
+                                            </tr>
+                                        </table>
+                                    </asp:Panel>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <asp:Panel ID="PrePanel" runat="server" Visible='<%#Eval("Pre_Requisites")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                            Pre-Requisite/s</td>
+                        <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                            <asp:Label ID="Pre_RequisitesLabel" runat="server" 
+                                Text='<%# Bind("Pre_Requisites") %>' />
+                        </td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="RPSPanel" runat="server" Visible='<%#Eval("R_P_S")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                            Recommended Prior Study:</td>
+                        <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                            <asp:Label ID="R_P_SLabel" runat="server" Text='<%# Bind("R_P_S") %>' />
+                        </td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="CoPanel" runat="server" Visible='<%#Eval("Co_Requisites")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                            Co-Requisite/s</td>
+                        <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                            <asp:Label ID="Co_RequisitesLabel" runat="server" 
+                                Text='<%# Bind("Co_Requisites") %>' />
+                        </td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="SharedPanel" runat="server" Visible='<%#Eval("SharedTeaching")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                            Shared Teaching:</td>
+                        <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                            <asp:Label ID="SharedTeachingLabel" runat="server" 
+                                Text='<%# Bind("SharedTeaching") %>' />
+                        </td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="PBRPanel" runat="server" Visible='<%#Eval("P_B_R")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                            Professional Body Requirement:</td>
+                        <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                            <asp:Label ID="P_B_RLabel" runat="server" Text='<%# Bind("P_B_R") %>' />
+                        </td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="GradedPanel" runat="server" Visible='<%#Eval("Graded")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                            Graded or not Graded:</td>
+                        <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                            <asp:Label ID="GradedLabel" runat="server" Text='<%# Bind("Graded") %>' />
+                        </td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="BarredPanel" runat="server" Visible='<%#Eval("BarredCombination")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td class="TemplateSubHeader" 
+                            style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699;">
+                            Barred Combination:</td>
+                        <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                            <asp:Label ID="BarredCombinationLabel" runat="server" 
+                                Text='<%# Bind("BarredCombination") %>' />
+                        </td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <br />
+           <asp:Panel ID="AimPanel" runat="server" Visible='<%#Eval("ModuleAims")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699; text-align: center;">
+                            Module Aim:</td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                            <asp:Label ID="ModuleAimsLabel" runat="server" 
+                                Text='<%# Bind("ModuleAims") %>' />
+                        </td>
+                    </tr>
+                </table>
+                <br />
+            </asp:Panel>
+            <asp:Panel ID="SynopsisPanel" runat="server">
+                <table style="width:100%;">
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699; text-align: center;">
+                            Module Synopsis:</td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                            <asp:Label ID="SynopsisLabel" runat="server" 
+                                Text='<%# Bind("Synopsis") %>' />
+                        </td>
+                    </tr>
+                </table>
+                <br />
+            </asp:Panel>
+            <asp:Panel ID="StrategyPanel" runat="server" Visible='<%#Eval("Strategy")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699; text-align: center;">
+                            Learning Strategy:</td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                            <asp:Label ID="StrategyLabel" runat="server" Text='<%# Bind("Strategy") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="SyllabusPanel" runat="server">
+                <table style="width:100%;">
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699; text-align: center;">
+                            Module Syllabus:</td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                            <asp:Label ID="SyllabusLabel" runat="server" 
+                                Text='<%# Bind("Syllabus") %>' />
+                        </td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <br />
+            <table style="width:100%;">
+                <tr>
+                    <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699; text-align: center;">
+                        Learning Outcomes:</td>
+                </tr>
+            </table>
+            <asp:Panel ID="OutcomesPanel" runat="server" Visible='<%#Eval("LearningOutcomes")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                            <asp:Label ID="LearningOutcomesLabel" runat="server" 
+                                
+                                Text='<%# Bind("LearningOutcomes") %>' />
+                        </td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <br />
+            <asp:Panel ID="KnowledgePanel" runat="server" Visible='<%#Eval("Knowledge")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 17.5px; color: #FFFFFF; background-color: #006699;">
+                            Knowledge &amp; Understanding:</td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 17px; background-color: #EEEEEE;">
+                            <asp:Label ID="KnowledgeLabel" runat="server" 
+                                Text='<%# Bind("Knowledge") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="AbilitiesPanel" runat="server" Visible='<%#Eval("Abilities")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 17.5px; color: #FFFFFF; background-color: #006699;">
+                            Abilities:</td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 17px; background-color: #EEEEEE;">
+                            <asp:Label ID="AbilitiesLabel" runat="server" 
+                                Text='<%# Bind("Abilities") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <table style="width:100%;">
+                <tr>
+                    <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699; text-align: center;">
+                        Assessment Strategy:</td>
+                </tr>
+            </table>
+            <asp:Panel ID="AssessmentPanel" runat="server">
+                <table style="width:100%;">
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                            <asp:Label ID="AssessmentStrategyLabel" runat="server" 
+                                
+                                Text='<%# Bind("AssessmentStrategy") %>' />
+                        </td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <br />
+            <asp:Panel ID="FormativePanel" runat="server" Visible='<%#Eval("Formative")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 17.5px; color: #FFFFFF; background-color: #006699;">
+                            Formative Assessment:
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 17px; background-color: #EEEEEE;">
+                            <asp:Label ID="FormativeLabel" runat="server" 
+                                Text='<%# Bind("Formative") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="SummativePanel" runat="server" Visible='<%#Eval("Summative")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 17.5px; color: #FFFFFF; background-color: #006699;">
+                            Summative Assessment:</td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 17px; background-color: #EEEEEE;" 
+                            class="style6">
+                            <asp:Label ID="SummativeLabel" runat="server" 
+                                Text='<%# Bind("Summative") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="TasksPanel" runat="server" Visible='<%#Eval("Tasks")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 17.5px; color: #FFFFFF; background-color: #006699;">
+                            Assessment Tasks/Weightings:</td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 17px; background-color: #EEEEEE;">
+                            <asp:Label ID="TasksLabel" runat="server" 
+                                Text='<%# Bind("Tasks") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="TablePanel" runat="server">
+                <table style="width:100%;">
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 17.5px; color: #FFFFFF; background-color: #006699;">
+                            Assessment Table:</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <asp:GridView ID="GridViewAssessmentTable" runat="server" 
+                                AutoGenerateColumns="False" DataKeyNames="SummativeID" 
+                                DataSourceID="SqlDataSourceTempTable" EnableTheming="True" Width="905px">
+                                <Columns>
+                                    <asp:BoundField DataField="SummativeID" HeaderText="SummativeID" 
+                                        InsertVisible="False" ReadOnly="True" SortExpression="SummativeID" 
+                                        Visible="False" />
+                                    <asp:BoundField DataField="AssessmentID" HeaderText="AssessmentID" 
+                                        SortExpression="AssessmentID" Visible="False" />
+                                    <asp:BoundField DataField="AssessmentType" HeaderText="Assessment Type" 
+                                        SortExpression="AssessmentType" />
+                                    <asp:BoundField DataField="LO" HeaderText="LO" SortExpression="LO" />
+                                    <asp:BoundField DataField="Summary" HeaderText="Summary" 
+                                        SortExpression="Summary" />
+                                    <asp:BoundField DataField="Component" HeaderText="Component" 
+                                        SortExpression="Component" />
+                                    <asp:CheckBoxField DataField="FE" HeaderText="FE" SortExpression="FE" />
+                                    <asp:CheckBoxField DataField="TR" HeaderText="TR" SortExpression="TR" />
+                                    <asp:CheckBoxField DataField="AM" HeaderText="AM" SortExpression="AM" />
+                                </Columns>
+                            </asp:GridView>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="style13">
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+             <asp:Panel ID="CriteriaPanel" runat="server" Visible='<%#Eval("Criteria")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 17.5px; color: #FFFFFF; background-color: #006699;">
+                            Assessment Criteria:</td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 17px; background-color: #EEEEEE;">
+                            <asp:Label ID="CriteriaLabel" runat="server" 
+                                Text='<%# Bind("Criteria") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="ResourcesPanel" runat="server" Visible='<%#Eval("ResourcesRequired")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699; text-align: center;">
+                            Resources Required:</td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                            <asp:Label ID="ResourcesRequiredLabel" runat="server" 
+                                
+                                Text='<%# Bind("ResourcesRequired") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="ReadingPanel" runat="server">
+                <table style="width:100%;">
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699; text-align: center;">
+                            Reading List:</td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                            <asp:HyperLink ID="ReadingListLabel" runat="server" 
+                                NavigateUrl='<%# Bind("ReadingList") %>' Target="_blank" 
+                                Text='<%# Bind("ReadingList") %>'></asp:HyperLink>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <asp:Panel ID="OtherPanel" runat="server" Visible='<%#Eval("OtherInfo")!=DBNull.Value%>'>
+                <table style="width:100%;">
+                    <tr>
+                        <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699; text-align: center;" 
+                            class="style5">
+                            Other Information:</td>
+                    </tr>
+                    <tr>
+                        <td class=" " 
+                            style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                            <asp:Label ID="OtherInfoLabel" runat="server" 
+                                Text='<%# Bind("OtherInfo") %>' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class=" ">
+                            &nbsp;</td>
+                    </tr>
+                </table>
+            </asp:Panel>
+            <table style="width:100%;">
+                <tr>
+                    <td style="font-family: Calibri; font-size: 20px; color: #FFFFFF; background-color: #006699; text-align: center;">
+                        Approved:</td>
+                </tr>
+                <tr>
+                    <td style="font-family: Calibri; font-size: 20px; background-color: #EEEEEE;">
+                        <asp:Label ID="ApprovedLabel" runat="server" 
+                            Text='<%# Bind("Approved") %>' />
+                        <asp:TextBox ID="TextBoxApproved" runat="server" Height="50px" 
+                            Text='<%# Bind("Approved") %>' TextMode="MultiLine" Visible="False" 
+                            Width="905px"></asp:TextBox>
+                        <asp:CustomValidator ID="CustomValidator2" runat="server" 
+                            ErrorMessage="You must update the Approved date before approving the module." 
+                            Font-Size="Medium" 
+                            ForeColor="Red"></asp:CustomValidator>
+                        <br />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        &nbsp;</td>
+                </tr>
+            </table>
+        </EditItemTemplate>
+        <EditRowStyle ForeColor="Black" />
+    </asp:FormView>
+    </div>
+</asp:Content>

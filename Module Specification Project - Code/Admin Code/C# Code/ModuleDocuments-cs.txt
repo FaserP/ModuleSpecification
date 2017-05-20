@@ -1,0 +1,130 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using Ionic.Zip;
+using System.IO;
+using System.Windows.Forms;
+using Microsoft.Office.Interop.Word;
+
+namespace ModuleSpecificationSite.Members
+{
+    public partial class ExportModules : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            //clear the error label.
+            lblError.Text = "";
+        }
+
+        protected void OpenFileLink_Click(object sender, EventArgs e)
+        {
+            //grab the file from the unishare page. Loops through each link in the gridview
+            for (int i = 0; i <= gvModuleSearchBox.Rows.Count - 1; i++)
+            {
+                //get the link button
+                string LinkbuttonDocument = ((System.Web.UI.WebControls.LinkButton)gvModuleSearchBox.FindControl("LinkButton1")).Text;
+                //String path = @"\\devunishare.hud.ac.uk@SSL\DavWWWRoot\faser\Module Specification Documents\" + test + ".docx";
+                string path = (Server.MapPath(@"~\Documents\Word\" + LinkbuttonDocument + ".docx"));
+                System.IO.FileInfo file = new System.IO.FileInfo(path);
+                //Passes through the file steam to allow the user to access the file.
+                if (file.Exists)
+                {
+                    Response.Clear();
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + file.Name);
+                    Response.AddHeader("Content-Length", file.Length.ToString());
+                    Response.ContentType = "application/octet-stream";
+                    Response.WriteFile(file.FullName);
+                    Response.End();
+                }
+                else
+                {
+                    //Prompt error if file doesn't exist
+                    Response.Write("This file does not exist.");
+                }
+            }
+
+        }
+
+        protected void ExportButton_Click(object sender, EventArgs e)
+        {
+            //If no selected index in check then error prompt
+            if (ModuleExportcb.SelectedIndex == -1)
+            {
+                lblError.Text = "Please select Module/s";
+            }
+            else
+            {
+                try
+                {
+                    //starts a new zip file
+                    lblError.Text = "";
+                    ZipFile multipleFiles = new ZipFile();
+                    Response.AddHeader("Content-Disposition", "attachment; filename=ModuleSpecFiles.zip");
+                    Response.ContentType = "application/zip";
+                    //loops through each checkbox to see which one is checked
+                    foreach (ListItem fileName in ModuleExportcb.Items)
+                    {
+                        //if the filename is selected then insert those files to the zip
+                        if (fileName.Selected)
+                        {
+                            string filePath = (Server.MapPath(@"~\Documents\Word\" + fileName.Value + ".docx"));
+                            //string filePath = @"\\devunishare.hud.ac.uk@SSL\DavWWWRoot\faser\Module Specification Documents\" + fileName.Value + ".docx";
+                            multipleFiles.AddFile(filePath, string.Empty);
+                        }
+                    }
+                    //gives a dialog to save the zip file
+                    multipleFiles.Save(Response.OutputStream);
+                    multipleFiles.Dispose();
+                    Response.End();
+                }
+                catch (FileNotFoundException)
+                {
+                    //prompt error if no file found.
+                    MessageBox.Show("Error: File not found.");
+                    
+                }
+
+            }
+
+         }
+
+        protected void lbSelectAll_Click(object sender, EventArgs e)
+        {
+            //Select all listboxes
+            foreach (ListItem item in ModuleExportcb.Items)
+                item.Selected = true;
+        }
+
+        protected void lbDeselectAll_Click(object sender, EventArgs e)
+        {
+            //Deselect all listboxes
+            foreach (ListItem item in ModuleExportcb.Items)
+                item.Selected = false;
+        }
+
+        protected void btnGetExcelReport_Click(object sender, ImageClickEventArgs e)
+        {
+            //Gets a excel report
+            string path = Server.MapPath(@"~\Documents\CheckListModuleReport.xlsx");
+
+            System.IO.FileInfo file = new System.IO.FileInfo(path);
+            if (file.Exists)
+            {
+                Response.Clear();
+                Response.AddHeader("Content-Disposition", "attachment; filename=" + file.Name);
+                Response.AddHeader("Content-Length", file.Length.ToString());
+                Response.ContentType = "application/octet-stream";
+                Response.WriteFile(file.FullName);
+                Response.End();
+            }
+            else
+            {
+                Response.Write("This file does not exist.");
+            }
+        }
+
+    }
+}

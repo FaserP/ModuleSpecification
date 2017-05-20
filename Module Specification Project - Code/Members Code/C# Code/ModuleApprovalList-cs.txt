@@ -1,0 +1,68 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace ModuleSpecificationSite.Members
+{
+    public partial class ModuleApprovalList : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            //The datasource select a command depending on the user roles.
+            //E.g if user is role of subject leader then the sql command gets all module that has the apporval person set up as
+            //the subject leader (1).
+            if (User.IsInRole("Subject Leader"))
+            {
+                SqlDataSourceApproval.SelectCommandType = SqlDataSourceCommandType.StoredProcedure;
+                SqlDataSourceApproval.SelectCommand = "GetSubjectLeaderList";
+            }
+            else if (User.IsInRole("Head Department"))
+            {
+                SqlDataSourceApproval.SelectCommandType = SqlDataSourceCommandType.StoredProcedure;
+                SqlDataSourceApproval.SelectCommand = "GetHeadDeptList";
+            }
+            if (User.IsInRole("SAVP Admin"))
+            {
+                SqlDataSourceApproval.SelectCommandType = SqlDataSourceCommandType.StoredProcedure;
+                SqlDataSourceApproval.SelectCommand = "GetSAVPList";
+            }
+            if (User.IsInRole("Head SAVP"))
+            {
+                SqlDataSourceApproval.SelectCommandType = SqlDataSourceCommandType.StoredProcedure;
+                SqlDataSourceApproval.SelectCommand = "GetHeadSAVPList";
+            }
+        }
+
+        protected void GridView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //First this gets the module code, title and ID which stores into a string
+            string getApprovedCode, getApprovedModuleID, getTitle;
+            //grabs the selected index on the gridview
+            int r = gvModuleApproval.SelectedIndex;
+            //Stores the code from the label and uses this into a session
+            getApprovedCode = ((LinkButton)gvModuleApproval.SelectedRow.FindControl("LinkButton1")).Text;
+            Session["getApprovedCode"] = getApprovedCode;
+            //Stores the title from the label and uses this into a session
+            getTitle = ((Label)gvModuleApproval.SelectedRow.FindControl("lblModuleTitle")).Text;
+            Session["getTitle"] = getTitle;
+            //Stores the id from the label and uses this into a session
+            getApprovedModuleID = gvModuleApproval.DataKeys[r].Value.ToString();
+            Session["getApprovedModuleID"] = getApprovedModuleID;
+            //If the code session is not null then
+            if (getApprovedCode != null)
+            {
+                //page redirect to the adminspecviewpage
+                Response.Redirect("~/Members/ModuleUpdatedViewPage.aspx?ModuleCode=" + getApprovedCode);
+            }
+            //If the code session is null then
+            else if (getApprovedCode == null)
+            {
+                //page redirect tao the admin search page
+                Response.Redirect("~/Members/ModuleSpecSearch.aspx");
+            }
+        }
+    }
+}

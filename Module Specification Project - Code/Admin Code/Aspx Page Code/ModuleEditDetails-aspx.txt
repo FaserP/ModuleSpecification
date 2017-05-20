@@ -1,0 +1,283 @@
+<%@ Page Title="Admin Edit/Add Details Page" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="ModuleEditDetails.aspx.cs" Inherits="ModuleSpecificationSite.Members.ModuleEditDetails" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
+    <div>
+        <h1 style="text-align: center">Admin Page - Add/Edit Details</h1>
+        <br />
+        <h2 style="text-align: center">Edit/Add Module Leaders</h2>
+        <asp:TextBox ID="tbTutorSearch" runat="server" MaxLength="50"></asp:TextBox>
+        <asp:Button ID="btnTutorSearch" runat="server" Font-Bold="True" Text="Search" />
+        <asp:Label ID="lblTutorRow" runat="server"></asp:Label>
+        <asp:SqlDataSource ID="SqlModuleLeader" runat="server" 
+            ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>"  
+            SelectCommand="GetTutors"   
+            UpdateCommand="UpdateTutors"  
+            InsertCommand="InsertNewTutor"
+            FilterExpression="[TutorName] LIKE '%{0}%'" 
+            InsertCommandType="StoredProcedure" SelectCommandType="StoredProcedure" 
+            UpdateCommandType="StoredProcedure">
+            <InsertParameters>
+                <asp:Parameter Name="TutorName" Type="String" />
+                <asp:Parameter Name="DeptID" Type="Int32" />
+            </InsertParameters>
+            <UpdateParameters>
+                <asp:Parameter Name="TutorID" Type="Int32" />
+                <asp:Parameter Name="TutorName" Type="String" />
+                <asp:Parameter Name="DeptID" Type="Int32" />
+            </UpdateParameters>
+            <FilterParameters>
+                <asp:ControlParameter ControlID="tbTutorSearch" Name="Textbox" PropertyName="Text" />
+            </FilterParameters>
+        </asp:SqlDataSource>
+        <asp:SqlDataSource ID="SqlDepartment" runat="server" 
+            ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>" 
+            SelectCommand="GetDepartment" SelectCommandType="StoredProcedure"></asp:SqlDataSource>
+        <asp:GridView ID="GridViewTutor" runat="server" AllowPaging="True" 
+            AutoGenerateColumns="False" BackColor="White" BorderColor="#CCCCCC" 
+            BorderStyle="None" BorderWidth="1px" CellPadding="3" 
+            DataKeyNames="TutorID" DataSourceID="SqlModuleLeader" 
+            Width="902px" 
+            ShowFooter="True" onrowdatabound="GridViewTutor_RowDataBound" 
+            style="margin-right: 3px">
+            <Columns>
+                <asp:TemplateField ShowHeader="False">
+                    <EditItemTemplate>
+                        <asp:LinkButton ID="LinkButtonUpdate" runat="server" CausesValidation="True" 
+                            CommandName="Update" Text="Update"></asp:LinkButton>
+                        &nbsp;<asp:LinkButton ID="LinkButtonCancel" runat="server" CausesValidation="False" 
+                            CommandName="Cancel" Text="Cancel"></asp:LinkButton>
+                    </EditItemTemplate>
+                    <FooterTemplate>
+                        <asp:LinkButton ID="lbInsertTutor" runat="server" onclick="lbInsertTutor_Click" 
+                            ForeColor="White">Insert</asp:LinkButton>
+                    </FooterTemplate>
+                    <ItemTemplate>
+                        <asp:LinkButton ID="LinkButtonEdit" runat="server" CausesValidation="False" 
+                            CommandName="Edit" Text="Edit"></asp:LinkButton>
+                    </ItemTemplate>
+                    <FooterStyle BackColor="#006699" />
+                </asp:TemplateField>
+                <asp:BoundField DataField="TutorID" HeaderText="TutorID" InsertVisible="False" 
+                    ReadOnly="True" SortExpression="TutorID" Visible="False" />
+                <asp:TemplateField HeaderText="Tutor Name" SortExpression="TutorName">
+                    <EditItemTemplate>
+                        <asp:TextBox ID="TextBox1" runat="server" Text='<%# Bind("TutorName") %>' 
+                            Width="250px"></asp:TextBox>
+                    </EditItemTemplate>
+                    <FooterTemplate>
+                        <asp:TextBox ID="tbTutorName" runat="server" Width="250px"></asp:TextBox>
+                        <asp:Label ID="TutorError" runat="server" ForeColor="Red" 
+                            Text="*This field is required." Visible="False"></asp:Label>
+                    </FooterTemplate>
+                    <ItemTemplate>
+                        <asp:Label ID="lblTutorName" runat="server" Text='<%# Bind("TutorName") %>'></asp:Label>
+                    </ItemTemplate>
+                    <FooterStyle BackColor="#006699" />
+                </asp:TemplateField>
+                <asp:TemplateField HeaderText="Department Name" SortExpression="DeptID">
+                    <EditItemTemplate>
+                        <asp:DropDownList ID="ddpTutorNameEdit" runat="server" 
+                            DataSourceID="SqlDepartment" DataTextField="DeptName" 
+                            DataValueField="DeptID" SelectedValue='<%# Bind("DeptID") %>' 
+                            Width="300px">
+                        </asp:DropDownList>
+                    </EditItemTemplate>
+                    <FooterTemplate>
+                        <asp:DropDownList ID="ddpTutorNameInsert" runat="server" 
+                            DataSourceID="SqlDepartment" DataTextField="DeptName" 
+                            DataValueField="DeptID" Width="300px">
+                        </asp:DropDownList>
+                    </FooterTemplate>
+                    <ItemTemplate>
+                        <asp:DropDownList ID="ddlTutorName" runat="server" Enabled="False"
+                        SelectedValue='<%# Bind("DeptID") %>' DataSourceID="SqlDepartment" 
+                            DataTextField="DeptName" DataValueField="DeptID" Width="300px">
+                        </asp:DropDownList>
+                    </ItemTemplate>
+                    <ControlStyle Width="300px" />
+                    <FooterStyle Width="300px" BackColor="#006699" />
+                    <ItemStyle Width="300px" />
+                </asp:TemplateField>
+            </Columns>
+            <EmptyDataTemplate>
+                No Tutor Found.
+            </EmptyDataTemplate>
+            <FooterStyle BackColor="White" ForeColor="#000066" />
+            <HeaderStyle BackColor="#006699" Font-Bold="True" ForeColor="White" />
+            <PagerStyle BackColor="White" ForeColor="#000066" HorizontalAlign="Left" />
+            <RowStyle ForeColor="#000066" />
+            <SelectedRowStyle BackColor="#669999" Font-Bold="True" ForeColor="White" />
+            <SortedAscendingCellStyle BackColor="#F1F1F1" />
+            <SortedAscendingHeaderStyle BackColor="#007DBB" />
+            <SortedDescendingCellStyle BackColor="#CAC9C9" />
+            <SortedDescendingHeaderStyle BackColor="#00547E" />
+        </asp:GridView>
+        <asp:Label ID="lblTutorSuccessful" runat="server" Text="Tutor has been added successfully" 
+            Visible="False"></asp:Label>
+    </div>
+    <br />
+    <div>
+    <h2 style="text-align: center">Edit/Add Courses</h2>
+        <asp:TextBox ID="tbCourseSearch" runat="server" MaxLength="50"></asp:TextBox>
+        <asp:Button ID="btnCourseSearch" runat="server" Font-Bold="True" 
+            Text="Search" />
+        <asp:Label ID="lblCourseRow" runat="server"></asp:Label>
+        <asp:SqlDataSource ID="SqlCourses" runat="server" 
+            ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>" 
+            InsertCommand="InsertNewCourse" 
+            SelectCommand="GetCourses" 
+            UpdateCommand="UpdateCourses"
+            FilterExpression="[CourseName] LIKE '%{0}%'" 
+            InsertCommandType="StoredProcedure" SelectCommandType="StoredProcedure" 
+            UpdateCommandType="StoredProcedure">
+            <InsertParameters>
+                <asp:Parameter Name="CourseName" Type="String" />
+            </InsertParameters>
+            <UpdateParameters>
+                <asp:Parameter Name="CourseID" Type="Int32" />
+                <asp:Parameter Name="CourseName" Type="String" />
+            </UpdateParameters>
+            <FilterParameters>
+                <asp:ControlParameter ControlID="tbCourseSearch" Name="Textbox" PropertyName="Text" />
+            </FilterParameters>
+        </asp:SqlDataSource>
+        <asp:GridView ID="GridViewCourses" runat="server" AllowPaging="True" 
+            AutoGenerateColumns="False" BackColor="White" BorderColor="#CCCCCC" 
+            BorderStyle="None" BorderWidth="1px" CellPadding="3" DataKeyNames="CourseID" 
+            DataSourceID="SqlCourses" ShowFooter="True" 
+            Width="902px" onrowdatabound="GridViewCourses_RowDataBound">
+            <Columns>
+                <asp:TemplateField ShowHeader="False">
+                    <EditItemTemplate>
+                        <asp:LinkButton ID="LinkButtonUpdate0" runat="server" CausesValidation="True" 
+                            CommandName="Update" Text="Update"></asp:LinkButton>
+                        &nbsp;<asp:LinkButton ID="LinkButtonCancel0" runat="server" CausesValidation="False" 
+                            CommandName="Cancel" Text="Cancel"></asp:LinkButton>
+                    </EditItemTemplate>
+                    <FooterTemplate>
+                        <asp:LinkButton ID="lbInsertCourses" runat="server" 
+                            onclick="lbInsertCourses_Click" ForeColor="White">Insert</asp:LinkButton>
+                    </FooterTemplate>
+                    <ItemTemplate>
+                        <asp:LinkButton ID="LinkButtonEdit0" runat="server" CausesValidation="False" 
+                            CommandName="Edit" Text="Edit"></asp:LinkButton>
+                    </ItemTemplate>
+                    <FooterStyle BackColor="#006699" />
+                </asp:TemplateField>
+                <asp:BoundField DataField="CourseID" HeaderText="CourseID" 
+                    InsertVisible="False" ReadOnly="True" SortExpression="CourseID" 
+                    Visible="False" />
+                <asp:TemplateField HeaderText="Course Name" SortExpression="CourseName">
+                    <EditItemTemplate>
+                        <asp:TextBox ID="tbEditCourse" runat="server" Text='<%# Bind("CourseName") %>' 
+                            Width="770px"></asp:TextBox>
+                    </EditItemTemplate>
+                    <FooterTemplate>
+                        <asp:TextBox ID="tbInsertCourse" runat="server" Width="250px"></asp:TextBox>
+                        <asp:Label ID="CourseError" runat="server" ForeColor="Red" 
+                            Text="*This field is required." Visible="False"></asp:Label>
+                    </FooterTemplate>
+                    <ItemTemplate>
+                        <asp:Label ID="lblCourses" runat="server" Text='<%# Bind("CourseName") %>'></asp:Label>
+                    </ItemTemplate>
+                    <FooterStyle BackColor="#006699" />
+                </asp:TemplateField>
+            </Columns>
+            <FooterStyle BackColor="White" ForeColor="#000066" BorderColor="#999999" />
+            <HeaderStyle BackColor="#006699" Font-Bold="True" ForeColor="White" />
+            <PagerStyle BackColor="White" ForeColor="#000066" HorizontalAlign="Left" />
+            <RowStyle ForeColor="#000066" />
+            <SelectedRowStyle BackColor="#669999" Font-Bold="True" ForeColor="White" />
+            <SortedAscendingCellStyle BackColor="#F1F1F1" />
+            <SortedAscendingHeaderStyle BackColor="#007DBB" />
+            <SortedDescendingCellStyle BackColor="#CAC9C9" />
+            <SortedDescendingHeaderStyle BackColor="#00547E" />
+        </asp:GridView>
+        <asp:Label ID="lblCourseSuccessful" runat="server" Text="Course has been added successfully" 
+            Visible="False"></asp:Label>
+    </div>
+    <br />
+    <div>
+        <h2 style="text-align: center">Edit/Add Location</h2>
+        <asp:TextBox ID="tbLocationSearch" runat="server" MaxLength="50"></asp:TextBox>
+        <asp:Button ID="btnLocationSearch" runat="server" Font-Bold="True" 
+            Text="Search" />
+        <asp:Label ID="lblLocationRow" runat="server"></asp:Label>
+        <asp:SqlDataSource ID="SqlLocation" runat="server" 
+            ConnectionString="<%$ ConnectionStrings:ModuleSpecDatabaseConnectionString %>" 
+            InsertCommand="InsertNewLocation" 
+            SelectCommand="GetLocation" 
+            UpdateCommand="UpdateLocations"
+            FilterExpression="[LocationName] LIKE '%{0}%'" 
+            InsertCommandType="StoredProcedure" SelectCommandType="StoredProcedure" 
+            UpdateCommandType="StoredProcedure">
+            <InsertParameters>
+                <asp:Parameter Name="LocationName" Type="String" />
+            </InsertParameters>
+            <UpdateParameters>
+                <asp:Parameter Name="LocationID" Type="Int32" />
+                <asp:Parameter Name="LocationName" Type="String" />
+            </UpdateParameters>
+            <FilterParameters>
+                <asp:ControlParameter ControlID="tbLocationSearch" Name="Textbox" PropertyName="Text" />
+            </FilterParameters>
+        </asp:SqlDataSource>
+        <asp:GridView ID="GridViewLocation" runat="server" AllowPaging="True" 
+            AutoGenerateColumns="False" BackColor="White" BorderColor="#CCCCCC" 
+            BorderStyle="None" BorderWidth="1px" CellPadding="3" DataKeyNames="LocationID" 
+            DataSourceID="SqlLocation" ShowFooter="True" Width="902px" 
+            onrowdatabound="GridViewLocation_RowDataBound">
+            <Columns>
+                <asp:TemplateField ShowHeader="False">
+                    <EditItemTemplate>
+                        <asp:LinkButton ID="LinkButtonUpdate" runat="server" CausesValidation="True" 
+                            CommandName="Update" Text="Update"></asp:LinkButton>
+                        &nbsp;<asp:LinkButton ID="LinkButtonCancel" runat="server" CausesValidation="False" 
+                            CommandName="Cancel" Text="Cancel"></asp:LinkButton>
+                    </EditItemTemplate>
+                    <FooterTemplate>
+                        <asp:LinkButton ID="lbInsertLocation" runat="server" 
+                            onclick="lbInsertLocation_Click" ForeColor="White">Insert</asp:LinkButton>
+                    </FooterTemplate>
+                    <ItemTemplate>
+                        <asp:LinkButton ID="LinkButtonEdit" runat="server" CausesValidation="False" 
+                            CommandName="Edit" Text="Edit"></asp:LinkButton>
+                    </ItemTemplate>
+                    <FooterStyle BackColor="#006699" />
+                </asp:TemplateField>
+                <asp:BoundField DataField="LocationID" HeaderText="LocationID" 
+                    InsertVisible="False" ReadOnly="True" SortExpression="LocationID" 
+                    Visible="False" />
+                <asp:TemplateField HeaderText="Location Name" SortExpression="LocationName">
+                    <EditItemTemplate>
+                        <asp:TextBox ID="tbEditLocation" runat="server" Text='<%# Bind("LocationName") %>' 
+                            Width="300px"></asp:TextBox>
+                    </EditItemTemplate>
+                    <FooterTemplate>
+                        <asp:TextBox ID="tbInsertLocation" runat="server" Width="250px"></asp:TextBox>
+                        <asp:Label ID="LocationError" runat="server" ForeColor="Red" 
+                            Text="*This field is required." Visible="False"></asp:Label>
+                    </FooterTemplate>
+                    <ItemTemplate>
+                        <asp:Label ID="lblLocation" runat="server" Text='<%# Bind("LocationName") %>'></asp:Label>
+                    </ItemTemplate>
+                    <FooterStyle BackColor="#006699" />
+                </asp:TemplateField>
+            </Columns>
+            <FooterStyle BackColor="White" ForeColor="#000066" />
+            <HeaderStyle BackColor="#006699" Font-Bold="True" ForeColor="White" />
+            <PagerStyle BackColor="White" ForeColor="#000066" HorizontalAlign="Left" />
+            <RowStyle ForeColor="#000066" />
+            <SelectedRowStyle BackColor="#669999" Font-Bold="True" ForeColor="White" />
+            <SortedAscendingCellStyle BackColor="#F1F1F1" />
+            <SortedAscendingHeaderStyle BackColor="#007DBB" />
+            <SortedDescendingCellStyle BackColor="#CAC9C9" />
+            <SortedDescendingHeaderStyle BackColor="#00547E" />
+        </asp:GridView>
+        <asp:Label ID="lblLocationSuccessful" runat="server" 
+            Text="Location has been added successfully" Visible="False"></asp:Label>
+        <br />
+    </div>
+    <br />
+</asp:Content>

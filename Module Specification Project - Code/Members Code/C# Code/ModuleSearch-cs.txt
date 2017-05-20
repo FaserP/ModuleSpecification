@@ -1,0 +1,94 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+
+
+namespace ModuleSpecificationSite.Members
+{
+    public partial class ModuleSpecSearch : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+        }
+
+        protected void gvModuleSearchBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //First this gets the module code, title and ID which stores into a string
+            string getCode, getTitle, getModuleID;
+            //grabs the selected index on the gridview
+            int r = gvModuleSearchBox.SelectedIndex;
+            //Stores the code from the label and uses this into a session
+            getCode = ((Label)gvModuleSearchBox.SelectedRow.FindControl("lblModuleCode")).Text;
+            Session["getCode"] = getCode;
+            //Stores the title from the label and uses this into a session
+            getTitle = ((Label)gvModuleSearchBox.SelectedRow.FindControl("lblModuleTitle")).Text;
+            Session["getTitle"] = getTitle;
+            //Stores the id from the label and uses this into a session
+            getModuleID = gvModuleSearchBox.DataKeys[r].Value.ToString();
+            Session["getModuleID"] = getModuleID;
+            //If the code session is not null then
+            if (getCode != null)
+            {
+                //page redirect to the adminspecviewpage
+                Response.Redirect("~/Members/ModuleSpecViewPage.aspx?ModuleCode=" + getCode);
+            }
+            //If the code session is null then
+            else if (getCode == null)
+            {
+                //page redirect to the admin search page
+                Response.Redirect("~/Members/ModuleSpecSearch.aspx");
+            }
+        }
+
+        protected void gvModuleSearchBox_SelectedIndexChanging(object sender, GridViewSelectEventArgs e)
+        {
+            //Clear the search error and session
+            lblSearchError.Text = "";
+            Session.Clear();
+        }
+
+        protected void gvModuleSearchBox_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            //If search textbox is empty then clearn the seachfound label else
+            if (tbSearch.Text == "")
+            {
+                lblSearchFound.Text = "";
+            }
+            else
+            {
+                //grabs the sql datasource select to find out how many are selected and uses
+                //this into the search found label to display
+                DataView dv = (DataView)SqlModuleSearch.Select(DataSourceSelectArguments.Empty);
+                int RowCount = dv.Count;
+                lblSearchFound.Text = String.Format("{0}", RowCount + " " + "record(s) were found using the keyword(s):" + " " + tbSearch.Text);
+            }
+
+        }
+
+        protected void btnSearch_Click(object sender, EventArgs e)
+        {
+            //if textbox is empty then searcherror appears else searcherror is empty.
+            if (tbSearch.Text == "")
+            {
+                lblSearchError.Text = "Please enter a search term";
+            }
+            else
+            {
+                lblSearchError.Text = "";
+            }
+        }
+
+        protected void dropdownSchools_DataBound(object sender, EventArgs e)
+        {
+            //grabs the sql datasource select to find out how many are selected and uses
+            //this into the search found label to display
+            DataView dv = (DataView)SqlModuleSearch.Select(DataSourceSelectArguments.Empty);
+            int RowCount = dv.Count;
+            lblSearchFound.Text = String.Format("{0}", RowCount + " " + "record(s) were found using the keyword(s):" + " " + tbSearch.Text);
+        }
+    }
+}

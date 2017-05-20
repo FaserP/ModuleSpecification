@@ -1,0 +1,11 @@
+<%@ Page Title="New Module Message Page" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="NewModuleMessage.aspx.cs" Inherits="ModuleSpecificationSite.Members.NewModuleMessage1" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
+    <div style="text-align: center; font-weight: bold; font-size: medium">
+        Your new module has been created.<br />
+        <br />
+        <asp:LinkButton ID="LinkButtonBack" runat="server" 
+            onclick="LinkButtonBack_Click">Click Here</asp:LinkButton>
+        &nbsp;to return back to the search page</div>
+</asp:Content>

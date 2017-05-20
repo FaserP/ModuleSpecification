@@ -1,0 +1,25 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace ModuleSpecificationSite.Members
+{
+    public partial class NewModuleMessage1 : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            //Abandon the session and clearn the cache to stop user going back to the page.
+            Session.Clear();
+            Response.Cache.SetCacheability(HttpCacheability.NoCache);
+        }
+
+        protected void LinkButtonBack_Click(object sender, EventArgs e)
+        {
+            //Redirect back to module search page
+            Response.Redirect("~/Members/ModuleSearch.aspx");
+        }
+    }
+}
