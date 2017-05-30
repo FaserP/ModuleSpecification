@@ -2,7 +2,7 @@
 
 A project that I have worked on for my placement year and final year project. The project is a module specification web application that stores the information and allows users to make changes.
 
-### [Read are some features]
+### [Some of the features]
 
 - Search module documents
 - Edit module doucments
